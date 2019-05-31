@@ -25,6 +25,7 @@ if(!class_exists('PPRSUS_Prison_Match')){
     public function __construct(){
       $this->load_dependencies();
       $this->admin_init();
+      $this->public_init();
       $this->define_template_hooks();
     }
 
@@ -60,6 +61,17 @@ if(!class_exists('PPRSUS_Prison_Match')){
     }//end admin_init
 
     /**
+     * define hooks for public facing stuff
+     */
+    public function public_init(){
+      $pprsus_public = new PPRSUS_Public();
+
+      add_action('wp_enqueue_scripts', array($pprsus_public, 'enqueue_scripts'));
+      add_action('wp_enqueue_scripts', array($pprsus_public, 'enqueue_styles'));
+
+    }
+
+    /**
      * define template hooks
      * register general template hooks
      */
@@ -67,6 +79,14 @@ if(!class_exists('PPRSUS_Prison_Match')){
       $template_functions = new PPRSUS_Template_Functions();
 
       add_filter('template_include', array($template_functions, 'load_template'), 99);
+
+      add_action('pprsus_to_dashboard_btn', array($template_functions, 'to_dashboard_btn'));
+      add_action('pprsus_before_worksheet', array($template_functions, 'before_worksheet'));
+      add_action('pprsus_worksheet', array($template_functions, 'worksheet'));
+
+      //add_action('pprsus_defendants_worksheet', array($template_functions, 'defendants_worksheet'));
+      //add_action('pprsus_medical_history_worksheet', array($template_functions, 'medical_history_worksheet'));
+      //add_action('pprsus_security_worksheet', array($template_functions, 'security_worksheet'));
     }//end define_template_hooks
 
     public function load_textdomain(){

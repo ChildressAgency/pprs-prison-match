@@ -11,6 +11,24 @@ function pprsus_get_template($template_name){
 if(!class_exists('PPRSUS_Template_Functions')){
   class PPRSUS_Template_Functions{
 
+    public function worksheet(){
+      new PPRSUS_MultiStep_Worksheet();
+    }
+
+    public function to_dashboard_btn(){
+      echo '<div class="btn-wrapper">';
+      echo  '<a href="' . esc_url(home_url('dashboard')) . '" class="btn">' . esc_html__('< Back to Dashboard', 'pprsus') . '</a>';
+      echo '</div>';
+    }
+
+    public function before_worksheet(){
+      $before_worksheet_content = get_option('options_before_worksheet_content');
+
+      if($before_worksheet_content){
+        echo apply_filters('the_content', wp_kses_post($before_worksheet_content));
+      }
+    }
+
     public function load_template($template){
       $template_name = '';
 
