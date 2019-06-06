@@ -29,6 +29,11 @@ if(!class_exists('PPRSUS_Public')){
 
       wp_enqueue_script('tablefilter');
       wp_enqueue_script('pprsus-script');
+
+      wp_localize_script('tablefilter', 'tablefilter_settings', array(
+        'tablefilter_basepath' => PPRSUS_PLUGIN_URL . 'vendors/tablefilter/',
+        'tablefilter_clear_text' => esc_html__('Display All', 'pprsus')
+      ));
     }
 
     /**
