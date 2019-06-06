@@ -76,7 +76,7 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
           'post_id' => $this->form_post_id,
           'step' => 'new_post' === $requested_post_id ? 1 : $requested_step,
           'post_type' => $this->form_post_type,
-          'post_status' => 'publish',
+          'post_status' => $this->validate_form() ? 'publish' : 'draft',
         )
       );
 
@@ -194,6 +194,7 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
         $token = wp_generate_password(rand(10,20), false, false);
         update_post_meta((int)$post_id, 'secret_token', $token);
         update_post_meta((int)$post_id, 'defendant_id', $defendant_info['defendant_id']);
+        update_post_meta((int)$post_id, 'date_created', date('F j, Y'));
       }
 
       if(($current_step < count($this->step_ids)) || $_POST['direction'] == 'previous' || $_POST['direction'] == 'saveforlater'){
@@ -314,6 +315,25 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
       }
 
       $this->send_to_dashboard();
+    }
+
+    public function skip_validation(){
+      if(!validate_form()){
+        acf_reset_validation_errors();
+      }
+    }
+
+    private function validate_form(){
+      if(!isset($_GET['finished']) || (int)$_GET['finished'] !== 1){
+        return false;
+      }
+      elseif(isset($_POST['direction'])){
+        if($_POST['direction'] == 'previous' || $_POST['direction'] == 'saveforlater'){
+          return false;
+        }
+      }
+
+      return true;
     }
 
     private function is_valid_form_type($form_type){
