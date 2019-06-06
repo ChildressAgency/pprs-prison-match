@@ -15,9 +15,13 @@ if(!class_exists('PPRSUS_Template_Functions')){
       new PPRSUS_MultiStep_Worksheet();
     }
 
+    public function dashboard(){
+      new PPRSUS_Dashboard();
+    }
+
     public function to_dashboard_btn(){
       echo '<div class="btn-wrapper">';
-      echo  '<a href="' . esc_url(home_url('dashboard')) . '" class="btn">' . esc_html__('< Back to Dashboard', 'pprsus') . '</a>';
+      echo  '<a href="' . esc_url(home_url('dashboard')) . '" class="btn">' . esc_html__('&lt; Back to Dashboard', 'pprsus') . '</a>';
       echo '</div>';
     }
 
@@ -27,6 +31,13 @@ if(!class_exists('PPRSUS_Template_Functions')){
       if($before_worksheet_content){
         echo apply_filters('the_content', wp_kses_post($before_worksheet_content));
       }
+    }
+
+    public function before_dashboard(){
+      echo '<div class="dashboard-header"><div class="btn_wrapper">';
+        $new_defendant_link = add_query_arg(array('form_type' => 'defendants'), home_url('worksheet'));
+        echo sprintf('<a href="%1$s" class="btn">%2$s</a>', esc_url($new_defendant_link), esc_html__('&plus; Create New Profile', 'pprsus'));
+      echo '</div></div>';
     }
 
     public function load_template($template){

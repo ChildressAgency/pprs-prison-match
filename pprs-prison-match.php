@@ -84,9 +84,8 @@ if(!class_exists('PPRSUS_Prison_Match')){
       add_action('pprsus_before_worksheet', array($template_functions, 'before_worksheet'));
       add_action('pprsus_worksheet', array($template_functions, 'worksheet'));
 
-      //add_action('pprsus_defendants_worksheet', array($template_functions, 'defendants_worksheet'));
-      //add_action('pprsus_medical_history_worksheet', array($template_functions, 'medical_history_worksheet'));
-      //add_action('pprsus_security_worksheet', array($template_functions, 'security_worksheet'));
+      add_action('pprsus_before_dashboard', array($template_functions, 'before_dashboard'));
+      add_action('pprsus_dashboard', array($template_functions, 'dashboard'));
     }//end define_template_hooks
 
     public function load_textdomain(){
