@@ -42,7 +42,7 @@ if(!class_exists('PPRSUS_Public')){
     public function enqueue_styles(){
       wp_register_style(
         'pprsus-style',
-        PPRSUS_PLUGIN_URL . 'css/pprsus-style.css',
+        PPRSUS_PLUGIN_URL . 'css/pprsus-style.css'
       );
 
       wp_register_style(
