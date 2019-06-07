@@ -6,8 +6,8 @@
         <div class="entry-content">
           <?php
             if(!is_user_logged_in()){
-              echo apply_filters('the_content', wp_kses_post(get_post_meta(get_the_ID(), 'login_message', true)));
-              echo sprintf(esc_html__('Please <a href="%1$s">Login</a>', 'pprsus'), wp_login_url(get_permalink()));
+              echo apply_filters('the_content', wp_kses_post(get_option('options_login_message')));
+              echo sprintf(esc_html__('Please <a href="%1$s">Login</a>', 'pprsus'), wp_login_url(home_url('dashboard')));
             }
             else{
               echo '<h3>' . esc_html__('PPRSUS Prison Match', 'pprsus') . '</h3>';
@@ -18,13 +18,13 @@
                 echo '</div>';
               }
               echo '<p>' . esc_html__('Create or edit your client profiles.', 'pprsus') . '</p>';
+            
+              do_action('pprsus_before_dashboard');
+
+              do_action('pprsus_dashboard');
+
+              do_action('pprsus_after_dashboard');
             }
-          
-            do_action('pprsus_before_dashboard');
-
-            do_action('pprsus_dashboard');
-
-            do_action('pprsus_after_dashboard');
           ?>
         </div>
       </div>
