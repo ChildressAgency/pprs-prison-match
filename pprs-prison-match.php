@@ -38,6 +38,7 @@ if(!class_exists('PPRSUS_Prison_Match')){
       require_once PPRSUS_PLUGIN_DIR . '/includes/pprsus-template-functions.php';
       require_once PPRSUS_PLUGIN_DIR . '/admin/class-pprsus-admin.php';
       require_once PPRSUS_PLUGIN_DIR . '/admin/class-pprsus-post-types.php';
+      require_once PPRSUS_PLUGIN_DIR . '/public/class-pprsus-public.php';
     }//end load_dependencies
 
     /**
