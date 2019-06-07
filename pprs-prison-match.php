@@ -86,6 +86,9 @@ if(!class_exists('PPRSUS_Prison_Match')){
 
       add_action('pprsus_before_dashboard', array($template_functions, 'before_dashboard'));
       add_action('pprsus_dashboard', array($template_functions, 'dashboard'));
+
+      add_action('pprsus_before_report', array($template_functions, 'before_review_information'));
+      add_action('pprsus_review_information', array($template_functions, 'review_information'));
     }//end define_template_hooks
 
     public function load_textdomain(){
