@@ -17,7 +17,7 @@ if(!class_exists('PPRSUS_Template_Functions')){
     }
 
     public function dashboard(){
-      require_once PPRSUS_PLUGIN_DIR . '/includes/class=pprsus-dashboard.php';
+      require_once PPRSUS_PLUGIN_DIR . '/includes/class-pprsus-dashboard.php';
       new PPRSUS_Dashboard();
     }
 
@@ -43,7 +43,7 @@ if(!class_exists('PPRSUS_Template_Functions')){
     public function before_dashboard(){
       echo '<div class="dashboard-header"><div class="btn_wrapper">';
         $new_defendant_link = add_query_arg(array('form_type' => 'defendants'), home_url('worksheet'));
-        echo sprintf('<a href="%1$s" class="btn">%2$s</a>', esc_url($new_defendant_link), esc_html__('&plus; Create New Profile', 'pprsus'));
+        echo sprintf('<a href="%1$s" class="btn">%2$s</a>', esc_url($new_defendant_link), esc_html__('+ Create New Profile', 'pprsus'));
       echo '</div></div>';
     }
 
@@ -54,11 +54,17 @@ if(!class_exists('PPRSUS_Template_Functions')){
     public function load_template($template){
       $template_name = '';
 
-      //if(is_page('worksheet')){
-      //  $template_name = 'page-worksheet.php';
-      //}
+      if(is_page('dashboard')){
+        $template_name = 'page-dashboard.php';
+      }
+      elseif(is_page('worksheet')){
+        $template_name = 'page-worksheet.php';
+      }
+      elseif(is_page('review-information')){
+        $template_name = 'page-review-information.php';
+      }
 
-      if($template_name != ''){
+      if($template_name !== ''){
         return $this->find_template($template_name);
       }
 
