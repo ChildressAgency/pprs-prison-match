@@ -97,9 +97,9 @@ if(!class_exists('PPRSUS_Post_Types')){
           'custom-fields',
           'revisions',
           'author'
-        );
-        register_post_type('security', $security_args);
+        )
       );
+      register_post_type('security', $security_args);
     }//end create_post_types()
 
   }
