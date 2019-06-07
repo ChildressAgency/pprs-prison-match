@@ -12,7 +12,8 @@ if(!class_exists('PPRSUS_Dashboard')){
     public function __construct(){
       $this->user_id = get_current_user_id();
 
-      add_action('init', array($this, 'output_dashboard'));
+      //add_action('init', array($this, 'output_dashboard'));
+      $this->output_dashboard();
     }
 
     public function output_dashboard(){
