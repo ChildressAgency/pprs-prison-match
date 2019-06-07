@@ -12,14 +12,17 @@ if(!class_exists('PPRSUS_Template_Functions')){
   class PPRSUS_Template_Functions{
 
     public function worksheet(){
+      require_once PPRSUS_PLUGIN_DIR . '/includes/class-pprsus-multistep-worksheet.php';
       new PPRSUS_MultiStep_Worksheet();
     }
 
     public function dashboard(){
+      require_once PPRSUS_PLUGIN_DIR . '/includes/class=pprsus-dashboard.php';
       new PPRSUS_Dashboard();
     }
 
     public function review_information(){
+      require_once PPRSUS_PLUGIN_DIR . '/includes/class-pprsus-review-information.php';
       new PPRSUS_Review_Information();
     }
 
