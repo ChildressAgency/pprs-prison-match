@@ -13,7 +13,7 @@ if(!class_exists('PPRSUS_Review_Information')){
       $this->defendant_id = $this->get_defendant_info();
       $this->user_id = get_current_user_id();
 
-      add_action('init', array($this, 'output_review_information');
+      add_action('init', array($this, 'output_review_information'));
     }
 
     public function output_review_information(){
@@ -134,14 +134,14 @@ if(!class_exists('PPRSUS_Review_Information')){
       $get_started_link = add_query_arg($get_started_link_args, home_url('worksheet'));
 
       echo '<h3>' . sprintf(esc_html__('A %1$s profile has not been started.', 'pprsus'), $post_type_name) . '</h3>';
-      echo sprintf('<a href="%1$s" class="button-primary">%2$s</a>'), $get_started_link, esc_html__('Get Started', 'pprsus'));
+      echo sprintf('<a href="%1$s" class="button-primary">%2$s</a>', $get_started_link, esc_html__('Get Started', 'pprsus'));
     }
 
     private function get_form_id($post_type){
       $form_query_args = array(
         'post_type' => $post_type,
         'author' => $this->user_id,
-        'posts_per_page' => 1
+        'posts_per_page' => 1,
         'meta_key' => 'defendant_id',
         'meta_value' => $this->defendant_id
       );
