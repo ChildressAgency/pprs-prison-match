@@ -13,7 +13,9 @@ if(!class_exists('PPRSUS_Template_Functions')){
 
     public function worksheet(){
       require_once PPRSUS_PLUGIN_DIR . '/includes/class-pprsus-multistep-worksheet.php';
-      new PPRSUS_MultiStep_Worksheet();
+      $worksheet = new PPRSUS_MultiStep_Worksheet(); 
+      $worksheet->output_acf_form();
+      //$worksheet->init();
     }
 
     public function dashboard(){
