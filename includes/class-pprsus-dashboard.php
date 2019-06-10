@@ -98,7 +98,8 @@ if(!class_exists('PPRSUS_Dashboard')){
         'author' => $this->user_id,
         'posts_per_page' => 1,
         'meta_key' => 'defendant_id',
-        'meta_value' => $defendant_id
+        'meta_value' => $defendant_id,
+        'post_status' => array('publish', 'draft')
       );
 
       $medical_history = new WP_Query($medical_query_args);
@@ -152,7 +153,8 @@ if(!class_exists('PPRSUS_Dashboard')){
         'author' => $this->user_id,
         'posts_per_page' => 1,
         'meta_key' => 'defendant_id',
-        'meta_value' => $defendant_id
+        'meta_value' => $defendant_id,
+        'post_status' => array('publish', 'draft')
       );
 
       $security = new WP_Query($security_query_args);
@@ -206,7 +208,7 @@ if(!class_exists('PPRSUS_Dashboard')){
         'post_type' => 'defendants',
         'author' => $this->user_id,
         'posts_per_page' => -1,
-        'post_status' => 'publish'
+        'post_status' => array('publish', 'draft')
       );
 
       return new WP_Query($defendants_query_args);
