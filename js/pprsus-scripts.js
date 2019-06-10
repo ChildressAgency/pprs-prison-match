@@ -16,6 +16,6 @@ jQuery(document).ready(function($){
   $('.pprsus-submit').on('click', function(){
     var direction = $(this).attr('name');
     $('#direction').val(direction);
-    $('.acf-form').submit();
+    $('#pprsus-worksheet').submit();
   });
 });
