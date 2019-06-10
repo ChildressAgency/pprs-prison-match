@@ -48,16 +48,20 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
      */
     private $defendant_id;
 
+    private $user_id;
+
     public function __construct(){
       $this->form_id = 'pprsus-worksheet';
       $this->form_post_type = $this->get_form_post_type();
       $this->step_ids = $this->get_form_step_ids();
       $this->form_post_id = $this->get_form_post_id();  //the post id or new_post
       $this->defendant_id = $this->get_defendant_id();  //the defendant id or new_defendant
+      $this->user_id = get_current_user_id();
 
-      add_action('init', array($this, 'output_acf_form'));
+      //$this->output_acf_form();
+      //add_action('init', array($this, 'output_acf_form'));
       add_action('acf/validate_save_post', array($this, 'skip_validation'), 10, 0);
-      add_action('acf/save_post', array($this, 'process_acf_form'), 20);
+      //add_action('acf/save_post', array($this, 'process_acf_form'), 20);
     }
 
     /**
@@ -65,6 +69,8 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
      */
     public function output_acf_form($args = []){
       if(!function_exists('acf_form')){ return; }
+
+      if(!$this->can_continue_requested_worksheet()){ $this->send_to_dashboard(); return; }
 
       //requested step - checks $_POST first then $_GET,
       //if neither will be 1
@@ -74,7 +80,7 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
         $args,
         array(
           'post_id' => $this->form_post_id,
-          'step' => 'new_post' === $requested_post_id ? 1 : $requested_step,
+          'step' => 'new_post' === $this->form_post_id ? 1 : $requested_step,
           'post_type' => $this->form_post_type,
           'post_status' => $this->validate_form() ? 'publish' : 'draft',
         )
@@ -95,19 +101,19 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
       $this->display_form_nav($args);
 
       //show the acf form
-      acf_form(
-        array(
-          'id' => $this->form_id,
-          'post_id' => $args['post_id'],
-          'new_post' => array(
-            'post_type' => $args['post_type'],
-            'post_status' => $args['post_status']
-          ),
-          'field_groups' => $current_step_group,
-          'submit_value' => $submit_label,
-          'html_after_fields' => $this->output_hidden_fields($args)
-        )
+      $form_args = array(
+        'id' => $this->form_id,
+        'post_id' => $args['post_id'],
+        'new_post' => array(
+          'post_type' => $args['post_type'],
+          'post_status' => $args['post_status']
+        ),
+        'field_groups' => $current_step_group,
+        'submit_value' => $submit_label,
+        'html_submit_button' => $submit_button,
+        'html_after_fields' => $this->output_hidden_fields($args)
       );
+      acf_form($form_args);
     }
 
     /**
@@ -159,27 +165,31 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
           echo '<li><span class="worksheet_nav_selected">M' . $i . '</span></li>';
         }
         else{
-          if($args['post_id'] == 'new_post' || !is_valid_token()){
-            echo '<li><span class="disabled">M' . $i . '</a></li>';
+          if($args['post_id'] == 'new_post' || !$this->is_valid_token()){
+            echo '<li><span class="disabled">M' . $i . '</span></li>';
           }
           else{
             $nav_args = array(
                'post_id' => $args['post_id'],
                'defendant_id' => $this->defendant_id,
                'token' => $_GET['token'],
-               'step' => $current_step
+               'step' => $current_step + 1
             );
 
-            echo '<li>' . add_query_arg($nav_args, home_url('worksheet')) . '</li>';
+            echo '<li><a href="' . add_query_arg($nav_args, home_url('worksheet')) . '" class="button-primary">M' . $i . '</a></li>';
           }
         }
       }
+
+      echo '</ul></div><div class="clearfix"></div>';
     }
 
     public function process_acf_form($post_id){
       if(is_admin() || !isset($_POST['pprsus-form-id']) || $_POST['pprsus-form-id'] != $this->form_id){
         return;
       }
+
+      //if(!$this->can_continue_requested_worksheet()){ return; }
 
       $current_step = $this->get_requested_step();
       $defendant_info = $this->get_defendant_info($post_id);
@@ -188,7 +198,8 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
         wp_update_post(array(
           'ID' => $post_id,
           'post_type' => $this->form_post_type,
-          'post_title' => $defendant_info['defendant_name']
+          'post_title' => $defendant_info['defendant_name'],
+          'post_author' => get_current_user_id()
         ));
 
         $token = wp_generate_password(rand(10,20), false, false);
@@ -229,7 +240,7 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
     }
 
     private function get_defendant_info($post_id){
-      if(isset($_GET['defendant_id'])){
+      if(isset($_GET['defendant_id']) && $this->form_post_type != 'defendants'){
         $defendant_id = sanitize_text_field($_GET['defendant_id']);
       }
       else{
@@ -255,12 +266,7 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
 
     public function get_form_post_id(){
       if(isset($_GET['post_id'])){
-        if($this->requested_post_is_valid() && $this->is_valid_token()){
-          return (int)$_GET['post_id'];
-        }
-        else{
-          $this->send_to_dashboard();
-        }
+        return (int)$_GET['post_id'];
       }
 
       return 'new_post';
@@ -268,8 +274,17 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
 
     public function get_defendant_id(){
       if(isset($_GET['defendant_id'])){
-        //TODO: check to see if current user can modify defendant
-        return $_GET['defendant_id'];
+        if($this->form_post_type == 'defendants'){
+          if($this->form_post_id == 'new_post'){
+            return 'new_defendant';
+          }
+          else{
+            return $this->form_post_id;
+          }
+        }
+        else{
+          return $_GET['defendant_id'];
+        }
       }
 
       return 'new_defendant';
@@ -295,6 +310,9 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
         FROM {$wpdb->prefix}posts
         WHERE post_type = %s
           AND post_content LIKE '%%%s%%'
+          AND post_excerpt NOT LIKE 'defendant-date-created'
+          AND post_excerpt NOT LIKE 'defendant-id'
+          AND post_status = 'publish'
           ORDER BY menu_order ASC", 'acf-field-group', $this->form_post_type));
 
       $g = 0;
@@ -309,16 +327,17 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
     public function get_form_post_type(){
       if(isset($_GET['form_type'])){
         $form_type = sanitize_text_field($_GET['form_type']);
-        if($this->is_valid_form_type($form_type)){
+        if($this->is_valid_form_post_type($form_type)){
           return $form_type;
         }
       }
 
-      $this->send_to_dashboard();
+      //$this->send_to_dashboard();
+      return false;
     }
 
     public function skip_validation(){
-      if(!validate_form()){
+      if(!$this->validate_form()){
         acf_reset_validation_errors();
       }
     }
@@ -336,7 +355,7 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
       return true;
     }
 
-    private function is_valid_form_type($form_type){
+    private function is_valid_form_post_type($form_type){
       $valid_form_types = array(
         'defendants',
         'medical_history',
@@ -350,8 +369,43 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
       return false;
     }
 
+    private function can_continue_requested_worksheet(){
+      if(!$this->is_valid_form_post_type($this->form_post_type)){ return false; }
+
+      if($this->form_post_id != 'new_post'){
+        if(!$this->requested_post_is_valid()){
+          return false;
+        }
+      }
+
+      return true;
+    }
+
     private function requested_post_is_valid(){
-      return (get_post_type((int)$_GET['post_id']) === $this->form_post_type && get_post_status((int)$_GET['post_id']) === 'publish');
+      //return (get_post_type((int)$_GET['post_id']) === $this->form_post_type && get_post_status((int)$_GET['post_id']) === 'publish');
+      if(isset($_GET['post_id']) && $this->is_valid_token()){
+        //does the requested post_id match the requested post_type
+        if(get_post_type((int)$_GET['post_id']) !== $this->form_post_type){
+          return false;
+        }
+
+        if(!$this->worksheet_belongs_to_user()){
+          return false;
+        }
+
+        return true;
+      }
+
+      return false;
+    }
+
+    private function worksheet_belongs_to_user(){
+      $worksheet_author = get_post_field('post_author', $this->form_post_id);
+      if($worksheet_author == $this->user_id){
+        return true;
+      }
+
+      return false;
     }
 
     private function is_valid_token(){
@@ -368,8 +422,9 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
     }
 
     public function send_to_dashboard(){
-      wp_safe_redirect(esc_url(home_url('dashboard')));
-      exit();
+      //wp_safe_redirect(home_url('dashboard'));
+      //exit();
+      echo '<p>' . sprintf(wp_kses_post(__('There was an error retrieving your form.  Please <a href="%s">return to your dashboard</a> and try again', 'pprsus'), array('a' => array('href' => array()))), esc_url(home_url('dashboard'))) . '</p>';
     }
 
     private function current_worksheet_is_finished(){
