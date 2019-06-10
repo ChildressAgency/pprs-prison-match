@@ -39,6 +39,7 @@ if(!class_exists('PPRSUS_Prison_Match')){
       require_once PPRSUS_PLUGIN_DIR . '/admin/class-pprsus-admin.php';
       require_once PPRSUS_PLUGIN_DIR . '/admin/class-pprsus-post-types.php';
       require_once PPRSUS_PLUGIN_DIR . '/public/class-pprsus-public.php';
+      require_once PPRSUS_PLUGIN_DIR . '/includes/class-pprsus-multistep-worksheet.php';
     }//end load_dependencies
 
     /**
@@ -70,6 +71,8 @@ if(!class_exists('PPRSUS_Prison_Match')){
       add_action('wp_enqueue_scripts', array($pprsus_public, 'enqueue_scripts'));
       add_action('wp_enqueue_scripts', array($pprsus_public, 'enqueue_styles'));
 
+      $worksheet = new PPRSUS_MultiStep_Worksheet();
+      add_action('acf/save_post', array($worksheet, 'process_acf_form'), 20);
     }
 
     /**
