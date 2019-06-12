@@ -72,6 +72,7 @@ if(!class_exists('PPRSUS_Prison_Match')){
       add_action('wp_enqueue_scripts', array($pprsus_public, 'enqueue_styles'));
 
       $worksheet = new PPRSUS_MultiStep_Worksheet();
+      add_action('acf/validate_save_post', array($worksheet, 'validate_form'), 10, 0);
       add_action('acf/save_post', array($worksheet, 'process_acf_form'), 20);
     }
 
