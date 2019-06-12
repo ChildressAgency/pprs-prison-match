@@ -9,7 +9,7 @@
           <?php 
             if(!is_user_logged_in()){
               echo apply_filters('the_content', wp_kses_post(get_option('options_login_message')));
-              echo sprintf(esc_html__('Please <a href="%1$s">Login</a>', 'pprsus'), wp_login_url(home_url('dashboard')));
+              echo sprintf(wp_kses_post(__('Please <a href="%1$s">Login</a>', 'pprsus'), array('a' => array('href' => array()))), wp_login_url(home_url('dashboard')));
             }
             else{
               do_action('pprsus_to_dashboard_btn');
