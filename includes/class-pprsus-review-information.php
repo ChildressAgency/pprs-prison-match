@@ -6,18 +6,19 @@ if(!defined('ABSPATH')){ exit; }
 
 if(!class_exists('PPRSUS_Review_Information')){
   class PPRSUS_Review_Information{
-    private $defendant_id;
+    private $defendant_info;
     private $user_id;
 
     public function __construct(){
-      $this->defendant_id = $this->get_defendant_info();
+      $this->defendant_info = $this->get_defendant_info();
       $this->user_id = get_current_user_id();
 
-      add_action('init', array($this, 'output_review_information'));
+      //add_action('init', array($this, 'output_review_information'));
+      $this->output_review_information();
     }
 
     public function output_review_information(){
-      $this->output_information('defendants', $defendant_id);
+      $this->output_information('defendants', $this->defendant_info['defendant_id']);
 
       $medical_id = $this->get_form_id('medical_history');
       if($medical_id){
@@ -37,18 +38,20 @@ if(!class_exists('PPRSUS_Review_Information')){
     }
 
     private function output_information($post_type, $post_id){
-      $info_groups = get_info_groups($post_type);
+      $info_groups = $this->get_info_groups($post_type);
+      $worksheet_link_counter = 1;
 
       foreach($info_groups as $group){
         $section_name = $this->get_section_name($group);
-        echo '<h3>' . esc_html__($section_name) . '</h3>
-              <div class="info-group">';
-
+        echo '<div class="info-section">
+                <h3>' . esc_html__($section_name) . '</h3>
+                <div class="info-group">';
 
         $fields = acf_get_fields($group);
         foreach($fields as $field){
-          if($this->conditional_met($field, $post_id)){
-            if(have_rows($field, $post_id) && field['type'] != 'checkbox' && $field['type'] != 'select'){
+          //print_var($field);
+          if($this->conditional_met($field, $post_id) && $field['type'] != 'message'){
+            if(have_rows($field['name'], $post_id) && $field['type'] != 'checkbox' && $field['type'] != 'select'){
               while(have_rows($field['name'], $post_id)){
                 the_row();
                 echo '<h3>' . esc_html($field['label']) . '</h3>';
@@ -57,23 +60,40 @@ if(!class_exists('PPRSUS_Review_Information')){
                 foreach($field_row as $field_row_key => $field_row_value){
                   $field_row_object = get_sub_field_object($field_row_key, $post_id);
 
-                  $this->output_field($field_row_object);
+                  $this->output_field($field_row_object, $post_id);
                 }
               }
             }
             else{
-              $this->output_field($field);
+              $this->output_field($field, $post_id);
             }
           }
         }
         echo '</div>';
+        $this->edit_worksheet_button($post_type, $post_id, $worksheet_link_counter);
+        echo '</div>';
+
+        $worksheet_link_counter++;
       }
     }
 
-    private function output_field($field){
+    private function edit_worksheet_button($post_type, $post_id, $worksheet_link_counter){
+      $worksheet_link_args = array(
+        'post_id' => $post_id,
+        'defendant_id' => $this->defendant_info['defendant_id'],
+        'step' => $worksheet_link_counter,
+        'token' => get_post_meta($post_id, 'secret_token', true),
+        'form_type' => $post_type
+      );
+      $worksheet_link = add_query_arg($worksheet_link_args, home_url('worksheet'));
+
+      echo '<a href="' . $worksheet_link . '" class="button-primary">' . esc_html__('Edit Worksheet') . '</a>';
+    }
+
+    private function output_field($field, $post_id){
       $field_label = $field['label'];
-      $field_value = $field['value'];
-      $field_width = $field['width'] ? $field['width'] : '100';
+      $field_value = get_field($field['name'], $post_id);
+      $field_width = $field['wrapper']['width'] ? $field['wrapper']['width'] : '100';
 
       if($field['type'] == 'true_false'){
         $field_value = $field['value'] == 1 ? 'Yes' : 'No';
@@ -85,14 +105,19 @@ if(!class_exists('PPRSUS_Review_Information')){
         }
       }
 
-      echo '<div style="width:' . $field_width . '%;">';
+      echo '<div class="info-field" style="width:' . $field_width . '%;">';
       echo '<strong>' . $field_label . '</strong><br />';
-      echo $field_label;
+      if($field['required'] == 1 && ($field_value == null || $field_value == '')){
+        echo '<span class="required">No entry - Required Field</span>';
+      }
+      else{
+        echo $field_value ? $field_value : '&nbsp;';
+      }
       echo '</div>';
     }
 
     private function conditional_met($field, $post_id){
-      $conditional_logic = $form_field['conditional_logic'];
+      $conditional_logic = $field['conditional_logic'];
       if(!is_array($conditional_logic)){ return true; }
 
       for($i = 0; $i < count($conditional_logic); $i++){
@@ -129,12 +154,13 @@ if(!class_exists('PPRSUS_Review_Information')){
 
       $get_started_link_args = array(
         'form_type' => $post_type,
-        'defendant_id' => $this->defendant_id
+        'defendant_id' => $this->defendant_info['defendant_id']
       );
       $get_started_link = add_query_arg($get_started_link_args, home_url('worksheet'));
 
-      echo '<h3>' . sprintf(esc_html__('A %1$s profile has not been started.', 'pprsus'), $post_type_name) . '</h3>';
+      echo '<div class="info-section"><h3>' . sprintf(esc_html__('A %1$s profile has not been started.', 'pprsus'), $post_type_name) . '</h3>';
       echo sprintf('<a href="%1$s" class="button-primary">%2$s</a>', $get_started_link, esc_html__('Get Started', 'pprsus'));
+      echo '</div>';
     }
 
     private function get_form_id($post_type){
@@ -143,7 +169,7 @@ if(!class_exists('PPRSUS_Review_Information')){
         'author' => $this->user_id,
         'posts_per_page' => 1,
         'meta_key' => 'defendant_id',
-        'meta_value' => $this->defendant_id
+        'meta_value' => $this->defendant_info['defendant_id']
       );
 
       $form_query = new WP_Query($form_query_args);
@@ -180,6 +206,8 @@ if(!class_exists('PPRSUS_Review_Information')){
         FROM {$wpdb->prefix}posts
         WHERE post_type = %s
           AND post_content LIKE '%%%s%%'
+          AND post_excerpt NOT LIKE 'defendant-id'
+          AND post_status = 'publish'
           ORDER BY menu_order ASC", 'acf-field-group', $post_type));
 
       $g = 0;
