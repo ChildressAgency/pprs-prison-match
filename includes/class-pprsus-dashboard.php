@@ -41,7 +41,7 @@ if(!class_exists('PPRSUS_Dashboard')){
             $this->output_defendant_field($defendant_id);
             $this->output_medical_history_field($defendant_id);
             $this->output_security_field($defendant_id);
-            echo '<td>' . esc_html(get_post_meta(get_the_ID(), 'date_created', true)) . '</td>';
+            echo '<td>' . wp_kses_post(get_post_meta($defendant_id, 'date_created', true)) . '</td>';
           echo '</tr>';
         }
       } 
