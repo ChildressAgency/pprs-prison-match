@@ -60,7 +60,7 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
 
       //$this->output_acf_form();
       //add_action('init', array($this, 'output_acf_form'));
-      add_action('acf/validate_save_post', array($this, 'skip_validation'), 10, 0);
+      //add_action('acf/validate_save_post', array($this, 'validate_form'), 10, 0);
       //add_action('acf/save_post', array($this, 'process_acf_form'), 20);
     }
 
@@ -143,7 +143,7 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
         $inputs[] = sprintf('<input type="button" id="pprsus-finish" name="finish" class="acf-button button button-primary button-large pprsus-submit" value="%1$s" />', esc_html__('Review and Finish', 'pprsus'));
       }
       else{ //form is finished we're at the validation stage, show a link to the dashboard
-        $inputs[] = sprintf('<div class="btn-wrapper"><a href="%1$s">%2$s</a></div>', esc_url(home_url('dashboard')), esc_html__('&lt; Back to Dashboard', 'pprsus'));
+        $inputs[] = sprintf('<div class="btn-wrapper"><a href="%1$s" class="btn">%2$s</a></div>', esc_url(home_url('dashboard')), esc_html__('&lt; Back to Dashboard', 'pprsus'));
       }
 
       $inputs[] = sprintf('<input type="button" id="pprsus-finish-later" name="saveforlater" class="acf-button button button-primary button-large pprsus-submit" value="%1$s" />', esc_html__('Save for Later', 'pprsus'));
@@ -161,27 +161,49 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
       echo '<div class="worksheet-nav"><ul class="nav-tabs">';
 
       for($i = 1; $i <= $number_of_steps; $i++){
+        $form_letter = $this->get_form_letter();
+
         if($i == $current_step){
-          echo '<li><span class="worksheet_nav_selected">M' . $i . '</span></li>';
+          echo '<li><span class="worksheet_nav_selected">' . $form_letter . $i . '</span></li>';
         }
         else{
           if($args['post_id'] == 'new_post' || !$this->is_valid_token()){
-            echo '<li><span class="disabled">M' . $i . '</span></li>';
+            echo '<li><span class="disabled">' . $form_letter . $i . '</span></li>';
           }
           else{
             $nav_args = array(
                'post_id' => $args['post_id'],
                'defendant_id' => $this->defendant_id,
                'token' => $_GET['token'],
-               'step' => $current_step + 1
+               'step' => $i,
+               'form_type' => $this->form_post_type
             );
 
-            echo '<li><a href="' . add_query_arg($nav_args, home_url('worksheet')) . '" class="button-primary">M' . $i . '</a></li>';
+            echo '<li><a href="' . add_query_arg($nav_args, home_url('worksheet')) . '" class="button-primary">' . $form_letter . $i . '</a></li>';
           }
         }
       }
 
       echo '</ul></div><div class="clearfix"></div>';
+    }
+
+    private function get_form_letter(){
+      switch($this->form_post_type){
+        case 'defendants':
+          return 'P';
+        break;
+
+        case 'medical_history':
+          return 'M';
+        break;
+
+        case 'security':
+          return 'S';
+        break;
+
+        default:
+          return 'F';
+      }
     }
 
     public function process_acf_form($post_id){
@@ -208,31 +230,41 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
         update_post_meta((int)$post_id, 'date_created', date('F j, Y'));
       }
 
-      if(($current_step < count($this->step_ids)) || $_POST['direction'] == 'previous' || $_POST['direction'] == 'saveforlater'){
-        $query_args = array(
-          'post_id' => $post_id,
-          'token' => isset($token) ? $token : $_GET['token'],
-          'defendant_id' => $defendant_info['defendant_id']
-        );
+      $query_args = array(
+        'post_id' => $post_id,
+        'token' => isset($token) ? $token : $_GET['token'],
+        'defendant_id' => $defendant_info['defendant_id'],
+        'form_type' => $_GET['form_type']
+      );
 
-        if(isset($_POST['direction'])){
-          switch($_POST['direction']){
-            case 'previous':
-              $query_args['step'] = --$current_step;
-            break;
+      if(isset($_POST['direction'])){
+        switch($_POST['direction']){
+          case 'saveforlater':
+            wp_safe_redirect(home_url('dashboard'));
+            exit();
+          break;
 
-            case 'next':
-              $query_args['step'] = ++$current_step;
-            break;
+          case 'previous':
+            $query_args['step'] = --$current_step;
+          break;
 
-            default:
-              $query_args['step'] = $current_step;
-          }
+          case 'next':
+            $query_args['step'] = ++$current_step;
+          break;
+
+          case 'finish':
+            $query_args['step'] = 0;
+            $query_args['finished'] = 1;
+          break;
+
+          default:
+            $query_args['step'] = $current_step;
         }
       }
-      else{
-        $query_args = array('finished' => 1);
-      }
+
+      //if($current_step >= count($this->step_ids)){
+      //  $query_args['finished'] = 1;
+      //}
 
       $redirect_url = add_query_arg($query_args, wp_get_referer());
       wp_safe_redirect($redirect_url);
@@ -291,6 +323,9 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
     }
 
     private function get_requested_step(){
+      if(isset($_GET['finished']) && $_GET['finished'] == 1){
+        return 0;
+      }
       if(isset($_POST['pprsus-current-step']) && absint($_POST['pprsus-current-step']) <= count($this->step_ids)){
         return absint($_POST['pprsus-current-step']);
       }
@@ -336,20 +371,23 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
       return false;
     }
 
-    public function skip_validation(){
-      if(!$this->validate_form()){
+    public function validate_form(){
+      if($this->skip_validation()){
         acf_reset_validation_errors();
       }
     }
 
-    private function validate_form(){
-      if(!isset($_GET['finished']) || (int)$_GET['finished'] !== 1){
-        return false;
-      }
-      elseif(isset($_POST['direction'])){
-        if($_POST['direction'] == 'previous' || $_POST['direction'] == 'saveforlater'){
-          return false;
+    private function skip_validation(){
+      //if(isset($_POST['direction']) && $_POST['direction'] == 'finish'){
+      //  return false;
+      //}
+
+      if(isset($_GET['finished']) && $_GET['finished'] == 1){
+        if((isset($_POST['direction'])) && ($_POST['direction'] == 'previous' || $_POST['direction'] == 'saveforlater')){
+          return true;
         }
+
+        return false;
       }
 
       return true;
