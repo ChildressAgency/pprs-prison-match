@@ -74,6 +74,9 @@ if(!class_exists('PPRSUS_Prison_Match')){
       $worksheet = new PPRSUS_MultiStep_Worksheet();
       add_action('acf/validate_save_post', array($worksheet, 'validate_form'), 10, 0);
       add_action('acf/save_post', array($worksheet, 'process_acf_form'), 20);
+
+      //auto populate date field on Defendant Personal Information
+      add_filter('acf/load_value/key=field_5ce6b5cad633f', array($worksheet, 'populate_date_field'), 20, 3);
     }
 
     /**

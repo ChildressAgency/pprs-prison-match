@@ -468,5 +468,13 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
     private function current_worksheet_is_finished(){
       return (isset($_GET['finished']) && (int)$_GET['finished'] === 1);
     }
+
+    public function populate_date_field($value, $post_id, $field){
+      if($value !== null){
+        return $value;
+      }
+
+      return date('F j, Y');
+    }
   }
 }
