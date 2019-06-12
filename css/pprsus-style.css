@@ -58,6 +58,13 @@
   font-weight:bold;
 }
 
+.psr-table .profile-icons{
+  float:right;
+}
+.psr-table .profile-icons>a{
+  margin-left:10px;
+}
+
 .worksheet-nav .nav-tabs{
   list-style:none;
   margin-top:25px;
