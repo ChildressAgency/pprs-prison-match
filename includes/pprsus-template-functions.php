@@ -8,6 +8,10 @@ function pprsus_get_template($template_name){
   return (new PPRSUS_Template_Functions)->find_template($template_name);
 }
 
+function print_var($var){
+  return (new PPRSUS_Template_Functions)->var_print($var);
+}
+
 if(!class_exists('PPRSUS_Template_Functions')){
   class PPRSUS_Template_Functions{
 
@@ -87,5 +91,9 @@ if(!class_exists('PPRSUS_Template_Functions')){
 
       return $template;
     }//end find_template()
+
+    public function var_print($var){
+      echo '<pre>' . print_r($var, true) . '</pre>';
+    }
   }//end class
 }

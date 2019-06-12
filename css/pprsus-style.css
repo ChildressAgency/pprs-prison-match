@@ -80,3 +80,25 @@
 .worksheet-nav .nav-tabs .finished{
   background-color:#009f00;
 }
+
+.blog-section .post.info-review{
+  background-color:transparent;
+}
+.info-field{
+  float:left;
+  margin-bottom:15px;
+}
+.info-section{
+  background-color:#fff;
+  padding:15px;
+  margin-bottom:30px;
+}
+.info-group::before{
+  display:table;
+  content:" ";
+}
+.info-group::after{
+  display:table;
+  content:" ";
+  clear:both;
+}

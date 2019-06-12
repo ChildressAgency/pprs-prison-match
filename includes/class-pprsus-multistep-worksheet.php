@@ -345,7 +345,6 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
         FROM {$wpdb->prefix}posts
         WHERE post_type = %s
           AND post_content LIKE '%%%s%%'
-          AND post_excerpt NOT LIKE 'defendant-date-created'
           AND post_excerpt NOT LIKE 'defendant-id'
           AND post_status = 'publish'
           ORDER BY menu_order ASC", 'acf-field-group', $this->form_post_type));

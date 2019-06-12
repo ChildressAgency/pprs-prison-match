@@ -1,7 +1,7 @@
 <?php get_header(); ?>
 <section class="blog-section">
   <div class="container">
-    <article id="post-<?php echo get_the_ID(); ?>" class="post" data-wow-delay=".4s">
+    <article id="post-<?php echo get_the_ID(); ?>" class="post info-review" data-wow-delay=".4s">
       <div class="post-content">
         <div class="entry-content">
           <?php
