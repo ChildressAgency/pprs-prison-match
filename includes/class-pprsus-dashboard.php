@@ -17,9 +17,12 @@ if(!class_exists('PPRSUS_Dashboard')){
     }
 
     public function output_dashboard(){
+      if(isset($_GET['delete']) && $_GET['delete'] == 1){
+        $this->delete_defendant();
+      }
       echo '<div class="dashboard">
               <div class="table-responsive">
-                <table id="psr-table" class="table table-striped pst-table">';
+                <table id="psr-table" class="table table-striped psr-table">';
       echo '<thead>
               <tr>
                 <th>' . esc_html__('User Name', 'pprsus') . '</th>
@@ -55,6 +58,7 @@ if(!class_exists('PPRSUS_Dashboard')){
 
     private function output_defendant_field($defendant_id){
       $defendant_name = get_the_title($defendant_id);
+      //edit defendant link settings
       $edit_link_args = array(
         'post_id' => $defendant_id,
         'defendant_id' => $defendant_id,
@@ -72,6 +76,7 @@ if(!class_exists('PPRSUS_Dashboard')){
 
       $edit_defendant_link_class = implode(' ', $edit_link_class);
 
+      //view defendant link settings
       $view_link_args = array(
         'defendant_id' => $defendant_id
       );
@@ -85,11 +90,25 @@ if(!class_exists('PPRSUS_Dashboard')){
 
       $view_defendant_link_class = implode(' ', $view_link_class);
 
+      //delete defendant link settings
+      $delete_link_args = $edit_link_args;
+      $delete_link_args['delete'] = 1;
+      $delete_defendant_link = add_query_arg($delete_link_args, home_url('dashboard'));
+
+      $delete_link_class = array();
+      $delete_link_class[] = 'dashicons';
+      $delete_link_class[] = 'dashicons-trash';
+      $delete_link_class[] = 'btn-worksheet';
+      $delete_link_class[] = 'validated-worksheet';
+
+      $delete_defendant_link_class = implode(' ', $delete_link_class);
+
       echo '<td>';
         echo esc_html($defendant_name);
-        echo '<a href="' . $edit_defendant_link . '" class="" title="' . esc_html__('Edit Defendant Profile', 'pprsus') . '"><span class="' . $edit_defendant_link_class . '"></span></a>';
+        echo '<span class="profile-icons"><a href="' . $edit_defendant_link . '" class="" title="' . esc_html__('Edit Defendant Profile', 'pprsus') . '"><span class="' . $edit_defendant_link_class . '"></span></a>';
         echo '<a href="' . $view_defendant_link . '" class="" title="' . esc_html__('View Defendant Report', 'pprsus') . '"><span class="' . $view_defendant_link_class . '"></span></a>';
-      echo '</td>';
+        echo '<a href="' . $delete_defendant_link . '" class="" title="' . esc_html__('Delete Defendant', 'pprsus') . '"><span class="' . $delete_defendant_link_class . '"></span></a>';
+      echo '</span></td>';
     }
 
     private function output_medical_history_field($defendant_id){
@@ -123,7 +142,7 @@ if(!class_exists('PPRSUS_Dashboard')){
 
           $edit_medical_link_class = implode(' ', $edit_link_class);
 
-          echo '<td><a href="' . $edit_medical_link . '" class="" title="' . esc_html__('Edit Medical History', 'pprsus') . '"><span class="' . $edit_medical_link_class . '"></span></td>';
+          echo '<td style="text-align:center;"><a href="' . $edit_medical_link . '" class="" title="' . esc_html__('Edit Medical History', 'pprsus') . '"><span class="' . $edit_medical_link_class . '"></span></td>';
         }
       }
       else{
@@ -142,7 +161,7 @@ if(!class_exists('PPRSUS_Dashboard')){
 
         $add_medical_link_class = implode(' ', $link_class);
 
-        echo '<td><a href="' . $add_medical_link . '" class="" title="' . esc_html__('Add Medical History', 'pprsus') . '"><span class="' . $add_medical_link_class . '"></span></a></td>';
+        echo '<td style="text-align:center;"><a href="' . $add_medical_link . '" class="" title="' . esc_html__('Add Medical History', 'pprsus') . '"><span class="' . $add_medical_link_class . '"></span></a></td>';
       }
       wp_reset_postdata();
     }
@@ -179,7 +198,7 @@ if(!class_exists('PPRSUS_Dashboard')){
 
           $edit_security_link_class = implode(' ', $edit_link_class);
 
-          echo '<td><a href="' . $edit_security_link . '" class="" title="' . esc_html__('Edit Security Information', 'pprsus') . '"><span class="' . $edit_security_link_class . '</span></a></td>';
+          echo '<td style="text-align:center;"><a href="' . $edit_security_link . '" class="" title="' . esc_html__('Edit Security Information', 'pprsus') . '"><span class="' . $edit_security_link_class . '</span></a></td>';
         }
       }
       else{
@@ -198,7 +217,7 @@ if(!class_exists('PPRSUS_Dashboard')){
 
         $add_security_link_class = implode(' ', $link_class);
 
-        echo '<td><a href="' . $add_security_link . '" class="" title="' . esc_html__('Add Security Information', 'pprsus') . '"><span class="' . $add_security_link_class . '"></span></a></td>';
+        echo '<td style="text-align:center;"><a href="' . $add_security_link . '" class="" title="' . esc_html__('Add Security Information', 'pprsus') . '"><span class="' . $add_security_link_class . '"></span></a></td>';
       }
       wp_reset_postdata();
     }
@@ -212,6 +231,58 @@ if(!class_exists('PPRSUS_Dashboard')){
       );
 
       return new WP_Query($defendants_query_args);
+    }
+
+    private function delete_defendant(){
+      if($this->user_can_modify_defendant()){
+        $defendant_id = $_GET['defendant_id'];
+        $defendant_name = get_the_title($defendant_id);
+
+        $this->delete_defendant_info($defendant_id, 'security');
+        $this->delete_defendant_info($defendant_id, 'medical_history');
+
+        wp_delete_post($defendant_id, true);
+
+        echo $defendant_name . ' deleted.';
+      }
+    }
+
+    private function delete_defendant_info($defendant_id, $post_type){
+      $defendant_info_args = array(
+        'post_type' => $post_type,
+        'author' => $this->user_id,
+        'posts_per_page' => -1,
+        'meta_key' => 'defendant_id',
+        'meta_value' => $defendant_id,
+        'post_status' => array('publish', 'draft')
+      );
+      $defendant_info = new WP_Query($defendant_info_args);
+
+      if($defendant_info->have_posts()){
+        while($defendant_info->have_posts()){
+          $defendant_info->the_post();
+          wp_delete_post(get_the_ID(), true);
+        }
+      }
+    }
+
+    private function user_can_modify_defendant(){
+      if(!isset($_GET['post_id']) || !isset($_GET['defendant_id']) || !isset($_GET['token'])){
+        return false;
+      }
+
+      $worksheet_author = get_post_field('post_author', $_GET['defendant_id']);
+      if($this->user_id != $worksheet_author){
+        return false;
+      }
+
+      $token_from_url = sanitize_text_field($_GET['token']);
+      $token_from_post_meta = get_post_meta((int)$_GET['defendant_id'], 'secret_token', true);
+      if($token_from_url != $token_from_post_meta){
+        return false;
+      }
+
+      return true;
     }
   }//end class
 }
