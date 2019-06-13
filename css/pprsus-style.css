@@ -87,6 +87,9 @@
 .worksheet-nav .nav-tabs .finished{
   background-color:#009f00;
 }
+.button-primary.worksheet-nav_disabled{
+  border-color:#eee
+}
 
 .blog-section .post.info-review{
   background-color:transparent;
@@ -108,4 +111,19 @@
   display:table;
   content:" ";
   clear:both;
+}
+
+#pprsus-worksheet .acf-field-message .acf-label{
+  display:none;
+}
+#pprsus-worksheet .acf-field-message .acf-input{
+  border:none;
+}
+#pprsus-worksheet .acf-input-wrap{
+  height:45px;
+}
+#pprsus-worksheet .acf-field-checkbox .acf-input,
+#pprsus-worksheet .acf-field-radio .acf-input,
+#pprsus-worksheet .acf-field-repeater .acf-input{
+  border:none;
 }

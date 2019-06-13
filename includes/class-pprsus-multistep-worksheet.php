@@ -164,11 +164,11 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
         $form_letter = $this->get_form_letter();
 
         if($i == $current_step){
-          echo '<li><span class="worksheet_nav_selected">' . $form_letter . $i . '</span></li>';
+          echo '<li><span class="button-primary worksheet-nav_disabled">' . $form_letter . $i . '</span></li>';
         }
         else{
           if($args['post_id'] == 'new_post' || !$this->is_valid_token()){
-            echo '<li><span class="disabled">' . $form_letter . $i . '</span></li>';
+            echo '<li><span class="button-primary worksheet-nav_disabled">' . $form_letter . $i . '</span></li>';
           }
           else{
             $nav_args = array(

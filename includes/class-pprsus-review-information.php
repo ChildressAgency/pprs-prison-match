@@ -111,7 +111,7 @@ if(!class_exists('PPRSUS_Review_Information')){
         echo '<span class="required">No entry - Required Field</span>';
       }
       else{
-        echo $field_value ? $field_value : '&nbsp;';
+        echo $field_value ? $field_value : '<span style="font-style:italic;">missing</span>';
       }
       echo '</div>';
     }
