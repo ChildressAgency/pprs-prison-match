@@ -49,6 +49,7 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
     private $defendant_id;
 
     private $user_id;
+    private $error_message = '';
 
     public function __construct(){
       $this->form_id = 'pprsus-worksheet';
@@ -70,7 +71,11 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
     public function output_acf_form($args = []){
       if(!function_exists('acf_form')){ return; }
 
-      if(!$this->can_continue_requested_worksheet()){ $this->send_to_dashboard(); return; }
+      if(!$this->can_continue_requested_worksheet()){ 
+        //$this->send_to_dashboard(); 
+        echo $this->error_message;
+        return; 
+      }
 
       //requested step - checks $_POST first then $_GET,
       //if neither will be 1
@@ -407,6 +412,11 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
     }
 
     private function can_continue_requested_worksheet(){
+      if(!$this->membership_allows_more()){
+        $this->error_message = get_option('options_reached_maximum_profiles_message');
+        return false;
+      }
+
       if(!$this->is_valid_form_post_type($this->form_post_type)){ return false; }
 
       if($this->form_post_id != 'new_post'){
@@ -416,6 +426,41 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
       }
 
       return true;
+    }
+
+    /**
+     * Subscription (Membership) Levels
+     * 1 = Individual (max defendants = 1)
+     * 2 = Lawyer (max defendants = 5)
+     * 3 = Firm (unlimited defendants)
+     */
+    private function membership_allows_more(){
+      $subscription_id = rcp_get_subscription_id($this->user_id);
+
+      $max_defendants = 0;
+      if($subscription_id == 3){ 
+        return true; 
+      }
+      elseif($subscription_id == 1){
+        $max_defendants = 1;
+      }
+      elseif($subscription_id == 2){
+        $max_defendants = 5;
+      }
+
+      $defendants_args = array(
+        'post_type' => 'defendants',
+        'author' => $this->user_id,
+        'posts_per_page' => -1,
+        'post_status' => array('publish', 'draft')
+      );
+
+      $defendants = new WP_Query($defendants_args);
+      if($defendants->found_posts < $max_defendants){
+        return true;
+      }
+
+      return false;
     }
 
     private function requested_post_is_valid(){
