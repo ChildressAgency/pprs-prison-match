@@ -100,7 +100,60 @@ if(!class_exists('PPRSUS_Post_Types')){
         )
       );
       register_post_type('security', $security_args);
-    }//end create_post_types()
 
+      $bop_drugs_labels = array(
+        'name' => esc_html_x('BOP Drugs', 'post type general name', 'pprsus'),
+        'singular_name' => esc_html_x('BOP Drug', 'post type singular name', 'pprsus'),
+        'menu_name' => esc_html_x('BOP Drug List', 'post type menu name', 'pprsus'),
+        'add_new_item' => esc_html__('Add New BOP Drug', 'pprsus'),
+        'search_items' => esc_html__('Search BOP Drug List', 'pprsus'),
+        'edit_item' => esc_html__('Edit BOP Drug', 'pprsus'),
+        'view_item' => esc_html__('View BOP Drug', 'pprsus'),
+        'all_items' => esc_html__('All BOP Drugs', 'pprsus'),
+        'new_item' => esc_html__('New BOP Drug', 'pprsus'),
+        'not_found' => esc_html__('BOP Drug Not Found', 'pprsus')
+      );
+
+      $bop_drugs_args = array(
+        'labels' => $bop_drugs_labels,
+        'capability_type' => 'post',
+        'public' => true,
+        'menu_position' => 8,
+        'menu_icon' => 'dashicons-plus-alt',
+        'query_var' => 'bop_drugs',
+        'has_archive' => false,
+        'show_in_rest' => true,
+        'supports' => array(
+          'title',
+          'custom-fields',
+          'revisions',
+          'author'
+        )
+      );
+      register_post_type('bop_drugs', $bop_drugs_args);
+
+      register_taxonomy(
+        'drug_types',
+        'bop_drugs',
+        array(
+          'hierarchical' => true,
+          'show_admin_column' => true,
+          'public' => true,
+          'labels' => array(
+            'name' => esc_html_x('Drug Types', 'taxonomy general name', 'pprsus'),
+            'singular_name' => esc_html_x('Drug Type', 'taxonomy singular name', 'pprsus'),
+            'menu_name' => esc_html_x('Drug Types', 'taxonomy menu name', 'pprsus'),
+            'search_items' => esc_html__('Search Drug Types', 'pprsus'),
+            'all_items' => esc_html__('All Drug Types', 'pprsus'),
+            'parent_item' => esc_html__('Parent Drug Type', 'pprsus'),
+            'parent_item_colon' => esc_html__('Parent Drug Type:', 'pprsus'),
+            'edit_item' => esc_html__('Edit Drug Type', 'pprsus'),
+            'update_item' => esc_html__('Update Drug Type', 'pprsus'),
+            'add_new_item' => esc_html__('Add New Drug Type', 'pprsus'),
+            'new_item_name' => esc_html__('New Drug Type Name', 'pprsus')
+          )
+        )
+      );
+    }//end create_post_types()
   }
 }
