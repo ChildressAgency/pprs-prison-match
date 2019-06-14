@@ -18,4 +18,39 @@ jQuery(document).ready(function($){
     $('#direction').val(direction);
     $('#pprsus-worksheet').submit();
   });
+
+  //change user
+  $('#user_name').on('click', '.update-author, .user-save, .user-cancel', function(e){
+    e.preventDefault();
+    var $clickedLink = $(this);
+    var profileData = get_profile_data($clickedLink);
+
+    if($clickedLink.hasClass('user-save')){
+      profileData['new_author'] = $('.user-options').val();
+    }
+
+    if($clickedLink.hasClass('user-cancel')){
+      profileData['cancel'] = 1;
+    }
+
+    process_request(profileData);
+  });
+
+  function get_profile_data($profile){
+    var data = {
+      'action': 'pprsus_change_user',
+      'nonce': $profile.data('nonce'),
+      'author_id': $profile.data('author_id'),
+      'user_id': $profile.data('user_id'),
+      'defendant_id': $profile.data('defendant_id')
+    };
+
+    return data;
+  }
+
+  function process_request(profileData){
+    $.post(pprsus_settings.pprsus_ajaxurl, profileData, function(response){
+      $('#user_name').html(response.data);
+    });
+  }
 });
