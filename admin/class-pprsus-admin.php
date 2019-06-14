@@ -20,5 +20,15 @@ if(!class_exists('PPRSUS_Admin')){
       return $dir;
     }//end acf_setting_dir
 
+    public function add_acf_options_page(){
+      acf_add_options_page(array(
+        'page_title' => esc_html__('Prison Match Form Settings', 'pprsus'),
+        'menu_title' => esc_html__('Prison Match Form Settings', 'pprsus'),
+        'menu_slug' => 'prison-match-form-settings',
+        'capability' => 'edit_posts',
+        'redirect' => false
+      ));
+    }
+
   }//end class
 }
