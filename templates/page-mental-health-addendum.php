@@ -12,36 +12,25 @@
                 the_content();
               }
             }
-          
+
           if(have_rows('mental_health_questions')): ?>
-            <ol type="I">
+            <div class="panel-group" id="mental-health-addendum" role="tablist" aria-multiselectable="true">
               <?php $i = 1; while(have_rows('mental_health_questions')): the_row(); ?>
-                <li class="bop-question section_<?php echo $i; ?>">
-
-                  <?php if(have_rows('question_parts')): $p = 0; while(have_rows('question_parts')): the_row(); ?>
-
-                    <?php if(get_sub_field('question_part_type') == 'Question'): ?>
-                    
-                      <?php if($p > 0){ echo '<div id="section_' . $i . '-' . $p . '" class="collapse">'; } ?>
-                        <?php echo apply_filters('the_content', wp_kses_post(get_sub_field('question_part'))); ?>
-                          <button type="button" class="button-primary" data-toggle="collapse" data-target="#section_<?php echo $i; ?>-<?php echo $p + 1; ?>" aria-expanded="false" aria-controls="section_<?php echo $i; ?>-<?php echo $p + 1; ?>">Yes</button>
-                      <?php if($p > 0){ echo '</div>'; } ?>
-
-                    <?php else: ?>
-
-                      <div id="section_<?php echo $i; ?>-<?php echo $p; ?>" class="collapse">
-                        <?php echo apply_filters('the_content', wp_kses_post(get_sub_field('program_content'))); ?>
-                      </div>
-
-                    <?php endif; ?>
-
-                  <?php $p++; endwhile; endif; ?>
-
-                </li>
+                <div class="panel panel-default">
+                  <div id="heading-<?php echo $i; ?>" class="panel-heading" role="tab">
+                    <h4 class="panel-title">
+                      <a href="#panel-<?php echo $i; ?>" class="collapsed" role="button" data-toggle="collapse" aria-expanded="false" aria-controls="panel-<?php echo $i; ?>"><?php echo apply_filters('the_content', wp_kses_post(get_sub_field('question'))); ?></a>
+                    </h4>
+                  </div>
+                  <div id="panel-<?php echo $i; ?>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-<?php echo $i; ?>">
+                    <div class="panel-body">
+                      <?php echo apply_filters('the_content', wp_kses_post(get_sub_field('question_content'))); ?>
+                    </div>
+                  </div>
+                </div>
               <?php $i++; endwhile; ?>
-            </ol>
-          <?php endif; ?>
-            
+            </div>
+          <?php endif; ?>            
         </div>
       </div>
     </article>
