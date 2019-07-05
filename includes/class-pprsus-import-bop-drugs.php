@@ -66,6 +66,7 @@ if(!class_exists('PPRSUS_Import_BOP_Drugs')){
         <div class="form-group">
           <label for="bop-drug-type" class="control-label"><?php echo esc_html__('Select the drug type.', 'pprsus'); ?></label>
           <select name="bop-drug-type" id="bop-drug-type" class="form-control">
+            <option value="">Choose one...</option>
             <?php foreach($drug_types as $drug_type): ?>
               <option value="<?php echo $drug_type->slug; ?>"><?php echo $drug_type->name; ?></option>
             <?php endforeach; ?>
@@ -103,6 +104,7 @@ if(!class_exists('PPRSUS_Import_BOP_Drugs')){
     private function import_csv($file_path){
       $bop_file = fopen($file_path, 'r');
       $head = fgetcsv($bop_file);
+      $drug_type = $_POST['bop-drug-type'];
 
       while(($column = fgetcsv($bop_file)) !== false){
         $column = array_combine($head, $column);
@@ -111,7 +113,7 @@ if(!class_exists('PPRSUS_Import_BOP_Drugs')){
         $advisories = $column['advisories'];
         $dose_frequency = $column['dose_frequency'];
 
-        $drug_id = $this->add_drug($drug_name);
+        $drug_id = $this->add_drug($drug_name, $drug_type);
 
         if(is_wp_error($drug_id)){
           echo esc_html__('Could not import ', 'pprsus') . $drug_name . '<br />' . $drug_id->get_error_message();
@@ -119,7 +121,7 @@ if(!class_exists('PPRSUS_Import_BOP_Drugs')){
         }
         
         $this->add_drug_meta($drug_id, $advisories, $dose_frequency);
-        echo $drug_name . esc_html__(' was imported.', 'pprsus');
+        echo $drug_name . esc_html__(' was imported.', 'pprsus') . '<br />';
       }
 
       fclose($bop_file);
@@ -127,18 +129,21 @@ if(!class_exists('PPRSUS_Import_BOP_Drugs')){
       echo esc_html__('Import complete.', 'pprsus');
     }
 
-    private function add_drug($drug_name){
-      $drug_type = $_POST['drug_type'];
+    private function add_drug($drug_name, $drug_type){
+      //$drug_type = $_POST['bop-drug-type'];
       $new_drug_args = array(
         'post_type' => 'bop_drugs',
         'post_title' => wp_strip_all_tags($drug_name),
         'post_status' => 'publish',
-        'tax_input' => array(
-          'drug_type' => array($drug_type)
-        )
+        //'tax_input' => array(
+        //  'drug_types' => array($drug_type)
+        //)
       );
       
-      return wp_insert_post($new_drug_args);
+      //return wp_insert_post($new_drug_args);
+      $new_drug_id = wp_insert_post($new_drug_args);
+      wp_set_object_terms($new_drug_id, $drug_type, 'drug_types');
+      return $new_drug_id;
     }
 
     private function add_drug_meta($drug_id, $advisories, $dose_frequency){
