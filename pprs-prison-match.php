@@ -41,6 +41,7 @@ if(!class_exists('PPRSUS_Prison_Match')){
       require_once PPRSUS_PLUGIN_DIR . '/public/class-pprsus-public.php';
       require_once PPRSUS_PLUGIN_DIR . '/includes/class-pprsus-multistep-worksheet.php';
       require_once PPRSUS_PLUGIN_DIR . '/includes/class-pprsus-import-bop-drugs.php';
+      require_once PPRSUS_PLUGIN_DIR . '/includes/class-pprsus-import-prison-data.php';
     }//end load_dependencies
 
     /**
@@ -85,6 +86,7 @@ if(!class_exists('PPRSUS_Prison_Match')){
       add_filter('acf/load_value/key=field_5ce6b5cad633f', array($worksheet, 'populate_date_field'), 20, 3);
 
       new PPRSUS_Import_BOP_Drugs();
+      new PPRSUS_Import_Prison_Data();
     }
 
     /**

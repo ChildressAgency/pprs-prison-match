@@ -154,6 +154,84 @@ if(!class_exists('PPRSUS_Post_Types')){
           )
         )
       );
+
+      $prison_data_labels = array(
+        'name' => esc_html_x('Prison Data', 'post type general name', 'pprsus'),
+        'singular_name' => esc_html_x('Prison Data', 'post type singular name', 'pprsus'),
+        'menu_name' => esc_html_x('Prison Data', 'post type menu name', 'pprsus'),
+        'add_new_item' => esc_html__('Add New Prison Data', 'pprsus'),
+        'search_items' => esc_html__('Search Prison Data', 'pprsus'),
+        'edit_item' => esc_html__('Edit Prison Data', 'pprsus'),
+        'view_item' => esc_html__('View Prison Data', 'pprsus'),
+        'add_items' => esc_html__('All Prison Data', 'pprsus'),
+        'new_item' => esc_html__('New Prison Data', 'pprsus'),
+        'not_found' => esc_html__('Prison Data Not Found', 'pprsus')
+      );
+
+      $prison_data_args = array(
+        'labels' => $prison_data_labels,
+        'capability_type' => 'post',
+        'public' => true,
+        'menu_position' => 6,
+        'menu_icon' => 'dashicons-analytics',
+        'query_var' => 'prison_data',
+        'has_archive' => false,
+        'show_in_rest' => true,
+        'supports' => array(
+          'title',
+          'editor',
+          'custom_fields',
+          'revisions',
+          'author'
+        )
+      );
+      register_post_type('prison_data', $prison_data_args);
+
+      register_taxonomy(
+        'security_level',
+        'prison_data',
+        array(
+          'hierarchical' => true,
+          'show_admin_column' => true,
+          'public' => true,
+          'labels' => array(
+            'name' => esc_html_x('Security Level', 'taxonomy general name', 'pprsus'),
+            'singular_name' => esc_html_x('Security Level', 'taxonomy singular name', 'pprsus'),
+            'menu_name' => esc_html_x('Security Levels', 'taxonomy menu name', 'pprsus'),
+            'search_items' => esc_html__('Search Security Levels', 'pprsus'),
+            'all_items' => esc_html__('All Security Levels', 'pprsus'),
+            'parent_item' => esc_html__('Parent Security Level', 'pprsus'),
+            'parent_item_colon' => esc_html__('Parent Security Level:', 'pprsus'),
+            'edit_item' => esc_html__('Edit Security Level', 'pprsus'),
+            'update_item' => esc_html__('Update Security Level', 'pprsus'),
+            'add_new_item' => esc_html__('Add New Security Level', 'pprsus'),
+            'new_item_name' => esc_html__('New Security Level', 'pprsus')
+          )
+        )
+      );
+
+      register_taxonomy(
+        'facility_care_level',
+        'prison_data',
+        array(
+          'hierarchical' => true,
+          'show_admin_column' => true,
+          'public' => true,
+          'labels' => array(
+            'name' => esc_html_x('Facility Care Levels', 'taxonomy general name', 'pprsus'),
+            'singular_name' => esc_html_x('Facility Care Level', 'taxonomy singular name', 'pprsus'),
+            'menu_name' => esc_html_x('Facility Care Levels', 'taxonomy menu name', 'pprsus'),
+            'search_items' => esc_html__('Search Facility Care Levels', 'pprsus'),
+            'all_items' => esc_html__('All Facility Care Levels', 'pprsus'),
+            'parent_item' => esc_html__('Parent Facility Care Level' , 'pprsus'),
+            'parent_item_colon' => esc_html__('Parent Facility Care Level:', 'pprsus'),
+            'edit_item' => esc_html__('Edit Facility Care Levels', 'pprsus'),
+            'update_item' => esc_html__('Update Facility Care Levels', 'pprsus'),
+            'add_new_item' => esc_html__('Add New Facility Care Level', 'pprsus'),
+            'new_item_name' => esc_html__('New Facility Care Level', 'pprsus')
+          )
+        )
+      );
     }//end create_post_types()
   }
 }
