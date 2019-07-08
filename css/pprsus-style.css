@@ -127,3 +127,10 @@
 #pprsus-worksheet .acf-field-repeater .acf-input{
   border:none;
 }
+
+.bop-question{
+  margin-bottom:25px;
+}
+.bop-question div{
+  margin-top:15px;
+}

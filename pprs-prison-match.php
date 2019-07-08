@@ -40,6 +40,8 @@ if(!class_exists('PPRSUS_Prison_Match')){
       require_once PPRSUS_PLUGIN_DIR . '/admin/class-pprsus-post-types.php';
       require_once PPRSUS_PLUGIN_DIR . '/public/class-pprsus-public.php';
       require_once PPRSUS_PLUGIN_DIR . '/includes/class-pprsus-multistep-worksheet.php';
+      require_once PPRSUS_PLUGIN_DIR . '/includes/class-pprsus-import-bop-drugs.php';
+      require_once PPRSUS_PLUGIN_DIR . '/includes/class-pprsus-import-prison-data.php';
     }//end load_dependencies
 
     /**
@@ -58,6 +60,8 @@ if(!class_exists('PPRSUS_Prison_Match')){
 
       add_action('init', array($this, 'load_textdomain'));
 
+      add_action('acf/init', array($pprsus_admin, 'add_acf_options_page'));
+
       $pprsus_post_types = new PPRSUS_Post_Types();
       add_action('init', array($pprsus_post_types, 'create_post_types'));
     }//end admin_init
@@ -71,12 +75,18 @@ if(!class_exists('PPRSUS_Prison_Match')){
       add_action('wp_enqueue_scripts', array($pprsus_public, 'enqueue_scripts'));
       add_action('wp_enqueue_scripts', array($pprsus_public, 'enqueue_styles'));
 
+      add_action('wp_ajax_nopriv_pprsus_change_user', array($pprsus_public, 'pprsus_change_user'));
+      add_action('wp_ajax_pprsus_change_user', array($pprsus_public, 'pprsus_change_user'));
+
       $worksheet = new PPRSUS_MultiStep_Worksheet();
       add_action('acf/validate_save_post', array($worksheet, 'validate_form'), 10, 0);
       add_action('acf/save_post', array($worksheet, 'process_acf_form'), 20);
 
       //auto populate date field on Defendant Personal Information
       add_filter('acf/load_value/key=field_5ce6b5cad633f', array($worksheet, 'populate_date_field'), 20, 3);
+
+      new PPRSUS_Import_BOP_Drugs();
+      new PPRSUS_Import_Prison_Data();
     }
 
     /**

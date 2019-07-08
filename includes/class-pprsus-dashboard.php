@@ -39,8 +39,11 @@ if(!class_exists('PPRSUS_Dashboard')){
         while($defendants->have_posts()){
           $defendants->the_post();
           $defendant_id = get_the_ID();
+          $author_name = get_the_author_meta('display_name');
+          $author_id = get_the_author_meta('ID');
           echo '<tr>';
-            echo '<td>' . esc_html(get_the_author_meta('display_name')) . '</td>';
+            //echo '<td>' . esc_html(get_the_author_meta('display_name')) . '</td>';
+            $this->output_user_name_field($defendant_id, $author_name, $author_id);
             $this->output_defendant_field($defendant_id);
             $this->output_medical_history_field($defendant_id);
             $this->output_security_field($defendant_id);
@@ -54,6 +57,20 @@ if(!class_exists('PPRSUS_Dashboard')){
       echo '    </table>
               </div>
             </div>';
+    }
+
+    private function output_user_name_field($defendant_id, $author_name, $author_id){
+      echo '<td><span id="user_name">' . $author_name;
+
+      if(rcpga_group_accounts()->members->is_group_owner($this->user_id) || rcpga_group_accounts()->members->is_group_admin($this->user_id)){
+        $nonce = wp_create_nonce('update_user' . $defendant_id);
+
+        echo '<span class="profile-icons"><a href="#" class="update-author" title="' . esc_html__('Change User', 'pprsus') . '" data-nonce="' . $nonce . '" data-author_id="' . $author_id . '" data-user_id="' . $this->user_id . '" data-defendant_id="' . $defendant_id . '">';
+        echo '<span class="dashicons dashicons-businessman btn-worksheet validated-worksheet"></span>';
+        echo '</a></span>';
+      }
+
+      echo '</span></td>';
     }
 
     private function output_defendant_field($defendant_id){
@@ -92,7 +109,9 @@ if(!class_exists('PPRSUS_Dashboard')){
 
       //delete defendant link settings
       $delete_link_args = $edit_link_args;
+      $delete_nonce = wp_create_nonce('delete_defendant_' . $defendant_id);
       $delete_link_args['delete'] = 1;
+      $delete_link_args['nonce'] = $delete_nonce;
       $delete_defendant_link = add_query_arg($delete_link_args, home_url('dashboard'));
 
       $delete_link_class = array();
@@ -114,7 +133,7 @@ if(!class_exists('PPRSUS_Dashboard')){
     private function output_medical_history_field($defendant_id){
       $medical_query_args = array(
         'post_type' => 'medical_history',
-        'author' => $this->user_id,
+        //'author' => $this->user_id,
         'posts_per_page' => 1,
         'meta_key' => 'defendant_id',
         'meta_value' => $defendant_id,
@@ -169,7 +188,7 @@ if(!class_exists('PPRSUS_Dashboard')){
     private function output_security_field($defendant_id){
       $security_query_args = array(
         'post_type' => 'security',
-        'author' => $this->user_id,
+        //'author' => $this->user_id,
         'posts_per_page' => 1,
         'meta_key' => 'defendant_id',
         'meta_value' => $defendant_id,
@@ -223,9 +242,20 @@ if(!class_exists('PPRSUS_Dashboard')){
     }
 
     private function get_defendants(){
+      $authors = array($this->user_id);
+
+      if(rcpga_group_accounts()->members->is_group_owner($this->user_id) || rcpga_group_accounts()->members->is_group_admin($this->user_id)){
+        $group_id = rcpga_group_accounts()->members->get_group_id($this->user_id);
+        $group_members = rcpga_group_accounts()->members->get_members($group_id, array(100, 0));
+        
+        foreach($group_members as $group_member){
+          $authors[] = $group_member->user_id;
+        }
+      }
+
       $defendants_query_args = array(
         'post_type' => 'defendants',
-        'author' => $this->user_id,
+        'author__in' => $authors,
         'posts_per_page' => -1,
         'post_status' => array('publish', 'draft')
       );
@@ -237,20 +267,26 @@ if(!class_exists('PPRSUS_Dashboard')){
       if($this->user_can_modify_defendant()){
         $defendant_id = $_GET['defendant_id'];
         $defendant_name = get_the_title($defendant_id);
+        $nonce = $_GET['nonce'];
 
-        $this->delete_defendant_info($defendant_id, 'security');
-        $this->delete_defendant_info($defendant_id, 'medical_history');
+        if(!wp_verify_nonce($nonce, 'delete_defendant_' . $defendant_id)){
+          echo esc_html__('There was a problem processing your request. Please refresh the page and try again.', 'pprsus');
+        }
+        else{
+          $this->delete_defendant_info($defendant_id, 'security');
+          $this->delete_defendant_info($defendant_id, 'medical_history');
 
-        wp_delete_post($defendant_id, true);
+          wp_delete_post($defendant_id, true);
 
-        echo $defendant_name . ' deleted.';
+          echo $defendant_name . ' deleted.';
+        }
       }
     }
 
     private function delete_defendant_info($defendant_id, $post_type){
       $defendant_info_args = array(
         'post_type' => $post_type,
-        'author' => $this->user_id,
+        //'author' => $this->user_id,
         'posts_per_page' => -1,
         'meta_key' => 'defendant_id',
         'meta_value' => $defendant_id,

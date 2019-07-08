@@ -69,6 +69,9 @@ if(!class_exists('PPRSUS_Template_Functions')){
       elseif(is_page('review-information')){
         $template_name = 'page-review-information.php';
       }
+      elseif(is_page('mental-health-addendum')){
+        $template_name = 'page-mental-health-addendum.php';
+      }
 
       if($template_name !== ''){
         return $this->find_template($template_name);
