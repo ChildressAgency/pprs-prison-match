@@ -30,11 +30,11 @@ if(!class_exists('PPRSUS_Import_BOP_Drugs')){
             $this->process_csv();
           }
           else{
-            $this->show_upload_form('File must be in csv format!');
+            $this->show_upload_form(esc_html__('File must be in csv format!', 'pprsus'));
           }
         }
         else{
-          $this->show_upload_form('No file selected!');
+          $this->show_upload_form(esc_html__('No file selected!', 'pprsus'));
         }
       }
       else{
