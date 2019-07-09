@@ -107,6 +107,9 @@ if(!class_exists('PPRSUS_Prison_Match')){
 
       add_action('pprsus_before_report', array($template_functions, 'before_review_information'));
       add_action('pprsus_review_information', array($template_functions, 'review_information'));
+
+      add_action('pprsus_before_match_prisons', array($template_functions, 'before_match_prisons'));
+      add_action('pprsus_match_prisons', array($template_functions, 'match_prisons'));
     }//end define_template_hooks
 
     public function load_textdomain(){
