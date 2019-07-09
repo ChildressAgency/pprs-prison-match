@@ -12,6 +12,13 @@
               echo sprintf(wp_kses_post(__('Please <a href="%1$s">Login</a>', 'pprsus'), array('a' => array('href' => array()))), wp_login_url(home_url('dashboard')));
             }
             else{
+              if(have_posts()){
+                while(have_posts()){
+                  the_post();
+                  the_content();
+                }
+              }
+              
               do_action('pprsus_to_dashboard_btn');
               do_action('pprsus_before_worksheet');
 
