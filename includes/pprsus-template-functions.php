@@ -32,6 +32,11 @@ if(!class_exists('PPRSUS_Template_Functions')){
       new PPRSUS_Review_Information();
     }
 
+    public function match_prisons(){
+      require_once PPRSUS_PLUGIN_DIR . '/includes/class-pprsus-match-prisons.php';
+      new PPRSUS_Match_Prisons();
+    }
+
     public function to_dashboard_btn(){
       echo '<div class="btn-wrapper">';
       echo  '<a href="' . esc_url(home_url('dashboard')) . '" class="btn">' . esc_html__('&lt; Back to Dashboard', 'pprsus') . '</a>';
@@ -57,6 +62,14 @@ if(!class_exists('PPRSUS_Template_Functions')){
       echo '<h2>' . esc_html__('Review PSR Information', 'pprsus') . '</h2>';
     }
 
+    public function before_match_prisons(){
+      $before_match_prisons_content = get_option('options_before_match_prisons_content');
+
+      if($before_match_prisons_content){
+        echo apply_filters('the_content', wp_kses_post($before_match_prisons_content));
+      }
+    }
+
     public function load_template($template){
       $template_name = '';
 
@@ -71,6 +84,9 @@ if(!class_exists('PPRSUS_Template_Functions')){
       }
       elseif(is_page('mental-health-addendum')){
         $template_name = 'page-mental-health-addendum.php';
+      }
+      elseif(is_page('match-prisons')){
+        $template_name = 'page-match-prisons.php';
       }
 
       if($template_name !== ''){
