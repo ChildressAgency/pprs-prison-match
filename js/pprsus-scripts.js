@@ -13,6 +13,8 @@ jQuery(document).ready(function($){
     dashboard_filter.init();
   }
 
+  $('[data-toggle="tooltip"]').tooltip();
+
   $('.pprsus-submit').on('click', function(){
     var direction = $(this).attr('name');
     $('#direction').val(direction);
