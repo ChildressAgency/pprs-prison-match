@@ -96,18 +96,6 @@ if(!class_exists('PPRSUS_Match_Prisons')){
       else{
         echo apply_filters('the_content', wp_kses_post(get_field('no_prisons_matched_message', 'option')));
       }
-
-      /*if($prison_list->have_posts()){
-        while($prison_list->have_posts()){
-          $prison_list->the_post();
-
-          //echo '<h2>' . the_title() . '</h2>';
-          include pprsus_get_template('loop/matched-prisons.php');
-        }
-      }
-      else{
-        echo apply_filters('the_content', wp_kses_post(get_field('no_prisons_matched_message', 'option')));
-      }*/
     }
 
     private function get_defendant_lat_lng(){
