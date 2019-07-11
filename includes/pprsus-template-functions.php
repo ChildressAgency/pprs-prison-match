@@ -112,7 +112,10 @@ if(!class_exists('PPRSUS_Template_Functions')){
     }//end find_template()
 
     public function var_print($var){
-      echo '<pre>' . print_r($var, true) . '</pre>';
+      //echo '<pre>' . print_r($var, true) . '</pre>';
+      echo '<pre>';
+      var_dump($var);
+      echo '</pre>';
     }
   }//end class
 }
