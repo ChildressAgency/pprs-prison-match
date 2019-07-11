@@ -61,6 +61,7 @@ if(!class_exists('PPRSUS_Prison_Match')){
       add_action('init', array($this, 'load_textdomain'));
 
       add_action('acf/init', array($pprsus_admin, 'add_acf_options_page'));
+      //add_action('acf/render_field_settings', array($pprsus_admin, 'add_care_level_setting'));
 
       $pprsus_post_types = new PPRSUS_Post_Types();
       add_action('init', array($pprsus_post_types, 'create_post_types'));
