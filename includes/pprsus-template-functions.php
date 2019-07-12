@@ -4,12 +4,16 @@
  */
 if(!defined('ABSPATH')){ exit; }
 
+function print_var($var){
+  return (new PPRSUS_Template_Functions)->var_print($var);
+}
+
 function pprsus_get_template($template_name){
   return (new PPRSUS_Template_Functions)->find_template($template_name);
 }
 
-function print_var($var){
-  return (new PPRSUS_Template_Functions)->var_print($var);
+function get_list_of_prisons($prison_security_level_term_ids, $prison_care_level_term_id, $lat_lng, $distance, $orderby = 'title'){
+  return (new PPRSUS_Template_Functions)->get_prison_list($prison_security_level_term_ids, $prison_care_level_term_id, $lat_lng, $distance, $orderby);
 }
 
 if(!class_exists('PPRSUS_Template_Functions')){
@@ -88,6 +92,9 @@ if(!class_exists('PPRSUS_Template_Functions')){
       elseif(is_page('match-prisons')){
         $template_name = 'page-match-prisons.php';
       }
+      elseif(is_singular('prison_data')){
+        $template_name = 'single-prison_data.php';
+      }
 
       if($template_name !== ''){
         return $this->find_template($template_name);
@@ -116,6 +123,42 @@ if(!class_exists('PPRSUS_Template_Functions')){
       echo '<pre>';
       var_dump($var);
       echo '</pre>';
+    }
+
+    public function get_prison_list($prison_security_level_term_ids, $prison_care_level_term_id, $lat_lng, $distance, $orderby){
+      if($orderby == 'title'){
+        $order_by = 'posts.post_title';
+      }
+      else{
+        $order_by = 'distance';
+      }
+
+      global $wpdb;
+      $prison_list = $wpdb->get_results($wpdb->prepare("
+        SELECT DISTINCT posts.ID,
+          ((ACOS(SIN(%f * PI() / 180) * SIN(prison_lat.meta_value * PI() / 180) + COS(%f * PI() / 180) * COS(prison_lat.meta_value * PI() / 180) * COS((%f - prison_lng.meta_value) * PI() / 180)) * 180 / PI()) * 60 * 1.1515) AS distance
+        FROM {$wpdb->prefix}postmeta AS prison_lat
+        INNER JOIN {$wpdb->prefix}posts AS posts ON posts.ID = prison_lat.post_id
+        LEFT JOIN {$wpdb->prefix}postmeta AS prison_lng ON prison_lat.post_id = prison_lng.post_id
+        LEFT JOIN {$wpdb->prefix}term_relationships AS relationships ON posts.ID = relationships.object_id
+        LEFT JOIN {$wpdb->prefix}term_relationships AS tt1 ON posts.ID = tt1.object_id
+        WHERE posts.post_type = 'prison_data'
+          AND posts.post_status = 'publish'
+          AND relationships.term_taxonomy_id IN (" . join(',', array_map('esc_sql', $prison_security_level_term_ids)) . ")
+          AND tt1.term_taxonomy_id IN (%d)
+          AND prison_lat.meta_key = 'latitude'
+          AND prison_lng.meta_key = 'longitude'
+        GROUP BY posts.ID
+        HAVING distance < %d
+        ORDER BY " . $order_by . " ASC",
+        $lat_lng['lat'],
+        $lat_lng['lat'],
+        $lat_lng['lng'],
+        $prison_care_level_term_id,
+        $distance
+      ));
+
+      return $prison_list;
     }
   }//end class
 }
