@@ -57,9 +57,13 @@
                     echo '<p><strong>Occupational Training:</strong> ' . implode(', ', $occupational_training) . '</p>'; 
                   }
 
-                  $pdf = get_field('prison_report');
-                  if($pdf){
-                    echo '<p><a href="' . $pdf['url'] . '">' . esc_html__('View Prison Report', 'pprsus') . '</a></p>';
+                  //$pdf = get_field('prison_report');
+                  //if($pdf){
+                  //  echo '<p><a href="' . $pdf['url'] . '">' . esc_html__('View Prison Report', 'pprsus') . '</a></p>';
+                  //}
+                  $prison_report_shortcode = get_field('prison_report_download_shortcode');
+                  if($prison_report_shortcode){
+                    echo '<p>' . do_shortcode($prison_report_shortcode) . '</p>';
                   }
                 }
               }
