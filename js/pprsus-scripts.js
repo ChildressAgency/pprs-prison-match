@@ -13,6 +13,23 @@ jQuery(document).ready(function($){
     dashboard_filter.init();
   }
 
+  if(document.getElementById('prison-list')){
+    $('#prison-list').tablesorter({
+      theme: 'bootstrap',
+      headers: {
+        0: {
+          sorter: 'text'
+        },
+        1: {
+          sorter: 'number'
+        },
+        2: {
+          sorter: false
+        }
+      }
+    });
+  }
+
   $('[data-toggle="tooltip"]').tooltip();
 
   $('.pprsus-submit').on('click', function(){
