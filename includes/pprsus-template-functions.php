@@ -42,7 +42,7 @@ if(!class_exists('PPRSUS_Template_Functions')){
     }
 
     public function to_dashboard_btn(){
-      echo '<div class="btn-wrapper">';
+      echo '<div class="btn-wrapper hidden-print">';
       echo  '<a href="' . esc_url(home_url('dashboard')) . '" class="btn">' . esc_html__('&lt; Back to Dashboard', 'pprsus') . '</a>';
       echo '</div>';
     }
