@@ -65,30 +65,7 @@ if(!class_exists('PPRSUS_Match_Prisons')){
         )
       ));*/
 
-      global $wpdb;
-      $prison_list = $wpdb->get_results($wpdb->prepare("
-        SELECT DISTINCT posts.ID,
-          ((ACOS(SIN(%f * PI() / 180) * SIN(prison_lat.meta_value * PI() / 180) + COS(%f * PI() / 180) * COS(prison_lat.meta_value * PI() / 180) * COS((%f - prison_lng.meta_value) * PI() / 180)) * 180 / PI()) * 60 * 1.1515) AS distance
-        FROM {$wpdb->prefix}postmeta AS prison_lat
-        INNER JOIN {$wpdb->prefix}posts AS posts ON posts.ID = prison_lat.post_id
-        LEFT JOIN {$wpdb->prefix}postmeta AS prison_lng ON prison_lat.post_id = prison_lng.post_id
-        LEFT JOIN {$wpdb->prefix}term_relationships AS relationships ON posts.ID = relationships.object_id
-        LEFT JOIN {$wpdb->prefix}term_relationships AS tt1 ON posts.ID = tt1.object_id
-        WHERE posts.post_type = 'prison_data'
-          AND posts.post_status = 'publish'
-          AND relationships.term_taxonomy_id IN (" . join(',', array_map('esc_sql', $prison_security_level_term_ids)) . ")
-          AND tt1.term_taxonomy_id IN (%d)
-          AND prison_lat.meta_key = 'latitude'
-          AND prison_lng.meta_key = 'longitude'
-        GROUP BY posts.ID
-        HAVING distance < %d
-        ORDER BY posts.post_title ASC",
-        $lat_lng['lat'],
-        $lat_lng['lat'],
-        $lat_lng['lng'],
-        $prison_care_level_term_id,
-        $distance
-      ));
+      $prison_list = get_list_of_prisons($prison_security_level_term_ids, $prison_care_level_term_id, $lat_lng, $distance);
 
       if($prison_list){
         include pprsus_get_template('loop/matched-prisons.php');
