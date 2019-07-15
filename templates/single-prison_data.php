@@ -34,12 +34,14 @@
                   $region = get_field_object('region');
                   if($region){
                     $region_value = $region['value'];
-                    $region_label = $region['choices'][$region_value];
+                    if($region_value){
+                      $region_label = $region['choices'][$region_value];
 
-                    echo '<p><strong>Region:</strong> ' . esc_html($region_label) . '</p>';
+                      echo '<p><strong>Region:</strong> ' . esc_html($region_label) . '</p>';
+                    }
                   }
                   echo '<p><strong>State:</strong> ' . esc_html(get_field('state')) . '</p>';
-                  echo '<p><strong>Facility Website:</strong> ' . esc_html(get_field('facility_web_site')) . '</p>';
+                  echo '<p><strong>Facility Website:</strong> <a href="' . esc_url(get_field('facility_web_site')) . '" target="_blank">' . esc_html(get_field('facility_web_site')) . '</a></p>';
                   echo '<p><strong>Inmate Population Gender:</strong> ' . esc_html(get_field('inmate_population_gender')) . '</p>';
 
                   $attributes = get_field('attributes');
