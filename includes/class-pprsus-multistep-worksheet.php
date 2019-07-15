@@ -235,6 +235,8 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
         update_post_meta((int)$post_id, 'date_created', date('F j, Y'));
       }
 
+      $this->set_modified_date($defendant_info['defendant_id']);
+
       $query_args = array(
         'post_id' => $post_id,
         'token' => isset($token) ? $token : $_GET['token'],
@@ -274,6 +276,11 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
       $redirect_url = add_query_arg($query_args, wp_get_referer());
       wp_safe_redirect($redirect_url);
       exit();
+    }
+
+    private function set_modified_date($defendant_id){
+      $today = date('Ymd');
+      update_post_meta($defendant_id, 'last_modified_date', $today);
     }
 
     private function get_defendant_info($post_id){
