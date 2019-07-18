@@ -87,7 +87,7 @@ if(!class_exists('PPRSUS_Review_Information')){
       );
       $worksheet_link = add_query_arg($worksheet_link_args, home_url('worksheet'));
 
-      echo '<a href="' . $worksheet_link . '" class="button-primary">' . esc_html__('Edit Worksheet') . '</a>';
+      echo '<a href="' . $worksheet_link . '" class="button-primary hidden-print">' . esc_html__('Edit Worksheet') . '</a>';
     }
 
     private function output_field($field, $post_id){
@@ -105,13 +105,20 @@ if(!class_exists('PPRSUS_Review_Information')){
         }
       }
 
-      echo '<div class="info-field" style="width:' . $field_width . '%;">';
+      $field_classes = array();
+      $field_classes[] = 'info-field';
+      if(($field['wrapper']['class'] == 'hide-print-if-no') && ($field_value == 'No' || $field_value == '')){
+        $field_classes[] = 'hide-print-if-no';
+      }
+      $field_class = implode(' ', $field_classes);
+
+      echo '<div class="' . $field_class . '" style="width:' . $field_width . '%;">';
       echo '<strong>' . $field_label . '</strong><br />';
       if($field['required'] == 1 && ($field_value == null || $field_value == '')){
-        echo '<span class="required">No entry - Required Field</span>';
+        echo '<span class="required hide-on-print">No entry - Required Field</span>';
       }
       else{
-        echo $field_value ? $field_value : '<span style="font-style:italic;">missing</span>';
+        echo $field_value ? $field_value : '<span class="hide-on-print" style="font-style:italic;">missing</span>';
       }
       echo '</div>';
     }
@@ -159,7 +166,7 @@ if(!class_exists('PPRSUS_Review_Information')){
       $get_started_link = add_query_arg($get_started_link_args, home_url('worksheet'));
 
       echo '<div class="info-section"><h3>' . sprintf(esc_html__('A %1$s profile has not been started.', 'pprsus'), $post_type_name) . '</h3>';
-      echo sprintf('<a href="%1$s" class="button-primary">%2$s</a>', $get_started_link, esc_html__('Get Started', 'pprsus'));
+      echo sprintf('<a href="%1$s" class="button-primary hidden-print">%2$s</a>', $get_started_link, esc_html__('Get Started', 'pprsus'));
       echo '</div>';
     }
 

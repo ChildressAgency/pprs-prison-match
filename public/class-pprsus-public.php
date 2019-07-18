@@ -27,7 +27,25 @@ if(!class_exists('PPRSUS_Public')){
         true
       );
 
+      wp_register_script(
+        'tablesort',
+        PPRSUS_PLUGIN_URL . 'vendors/tablesort/jquery.tablesorter.min.js',
+        array('jquery'),
+        PPRSUS_VERSION,
+        true
+      );
+
+      wp_register_script(
+        'tablesort-widgets',
+        PPRSUS_PLUGIN_URL . 'vendors/tablesort/jquery.tablesorter.widgets.min.js',
+        array('jquery', 'tablesort'),
+        PPRSUS_VERSION,
+        true
+      );
+
       wp_enqueue_script('tablefilter');
+      wp_enqueue_script('tablesort');
+      wp_enqueue_script('tablesort-widgets');
       wp_enqueue_script('pprsus-script');
 
       wp_localize_script('tablefilter', 'tablefilter_settings', array(
@@ -54,7 +72,13 @@ if(!class_exists('PPRSUS_Public')){
         PPRSUS_PLUGIN_URL . 'vendors/tablefilter/style/tablefilter.css'
       );
 
+      wp_register_style(
+        'tablesort-bootstrap-style',
+        PPRSUS_PLUGIN_URL . 'vendors/tablesort/css/theme.bootstrap_4.min.css'
+      );
+
       wp_enqueue_style('tablefilter-style');
+      wp_enqueue_style('tablesort-bootstrap-style');
       wp_enqueue_style('pprsus-style');
     }
 

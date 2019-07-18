@@ -124,9 +124,9 @@ if(!class_exists('PPRSUS_Dashboard')){
 
       echo '<td>';
         echo esc_html($defendant_name);
-        echo '<span class="profile-icons"><a href="' . $edit_defendant_link . '" class="" title="' . esc_html__('Edit Defendant Profile', 'pprsus') . '"><span class="' . $edit_defendant_link_class . '"></span></a>';
-        echo '<a href="' . $view_defendant_link . '" class="" title="' . esc_html__('View Defendant Report', 'pprsus') . '"><span class="' . $view_defendant_link_class . '"></span></a>';
-        echo '<a href="' . $delete_defendant_link . '" class="" title="' . esc_html__('Delete Defendant', 'pprsus') . '"><span class="' . $delete_defendant_link_class . '"></span></a>';
+        echo '<span class="profile-icons"><a href="' . $edit_defendant_link . '" data-toggle="tooltip" class="" title="' . esc_html__('Edit Defendant Profile', 'pprsus') . '"><span class="' . $edit_defendant_link_class . '"></span></a>';
+        echo '<a href="' . $view_defendant_link . '" data-toggle="tooltip" class="" title="' . esc_html__('View Defendant Report', 'pprsus') . '"><span class="' . $view_defendant_link_class . '"></span></a>';
+        echo '<a href="' . $delete_defendant_link . '" data-toggle="tooltip" class="" title="' . esc_html__('Delete Defendant', 'pprsus') . '"><span class="' . $delete_defendant_link_class . '"></span></a>';
       echo '</span></td>';
     }
 
@@ -161,7 +161,7 @@ if(!class_exists('PPRSUS_Dashboard')){
 
           $edit_medical_link_class = implode(' ', $edit_link_class);
 
-          echo '<td style="text-align:center;"><a href="' . $edit_medical_link . '" class="" title="' . esc_html__('Edit Medical History', 'pprsus') . '"><span class="' . $edit_medical_link_class . '"></span></td>';
+          echo '<td style="text-align:center;"><a href="' . $edit_medical_link . '" data-toggle="tooltip" class="" title="' . esc_html__('Edit Medical History', 'pprsus') . '"><span class="' . $edit_medical_link_class . '"></span></td>';
         }
       }
       else{
@@ -180,7 +180,7 @@ if(!class_exists('PPRSUS_Dashboard')){
 
         $add_medical_link_class = implode(' ', $link_class);
 
-        echo '<td style="text-align:center;"><a href="' . $add_medical_link . '" class="" title="' . esc_html__('Add Medical History', 'pprsus') . '"><span class="' . $add_medical_link_class . '"></span></a></td>';
+        echo '<td style="text-align:center;"><a href="' . $add_medical_link . '" data-toggle="tooltip" class="" title="' . esc_html__('Add Medical History', 'pprsus') . '"><span class="' . $add_medical_link_class . '"></span></a></td>';
       }
       wp_reset_postdata();
     }
@@ -200,11 +200,13 @@ if(!class_exists('PPRSUS_Dashboard')){
         while($security->have_posts()){
           $security->the_post();
 
+          $security_form_id = get_the_ID();
+
           $edit_link_args = array(
-            'post_id' => get_the_ID(),
+            'post_id' => $security_form_id,
             'defendant_id' => $defendant_id,
             'step' => 1,
-            'token' => get_post_meta(get_the_ID(), 'secret_token', true),
+            'token' => get_post_meta($security_form_id, 'secret_token', true),
             'form_type' => 'security'
           );
           $edit_security_link = add_query_arg($edit_link_args, home_url('worksheet'));
@@ -217,7 +219,25 @@ if(!class_exists('PPRSUS_Dashboard')){
 
           $edit_security_link_class = implode(' ', $edit_link_class);
 
-          echo '<td style="text-align:center;"><a href="' . $edit_security_link . '" class="" title="' . esc_html__('Edit Security Information', 'pprsus') . '"><span class="' . $edit_security_link_class . '</span></a></td>';
+          $match_prisons_link_args = array(
+            'post_id' => $security_form_id,
+            'defendant_id' => $defendant_id,
+            'token' => get_post_meta($security_form_id, 'secret_token', true),
+          );
+          $match_prisons_link = add_query_arg($match_prisons_link_args, home_url('match-prisons'));
+
+          $match_link_class = array();
+          $match_link_class[] = 'dashicons';
+          $match_link_class[] = 'dashicons-search';
+          $match_link_class[] = 'btn-worksheet';
+          $match_link_class[] = (get_post_status() == 'publish') ? 'validated-worksheet' : 'draft-worksheet';
+
+          $match_prisons_link_class = implode(' ', $match_link_class);
+
+          echo '<td style="text-align:center;">';
+          echo '<a href="' . $edit_security_link . '" data-toggle="tooltip" class="" title="' . esc_html__('Edit Security Information', 'pprsus') . '"><span class="' . $edit_security_link_class . '"></span></a>';
+          echo '<a href="' . $match_prisons_link . '" data-toggle="tooltip" class="" title="' . esc_html__('Match Prisons', 'pprsus')  . '" style="margin-left:15px;"><span class="' . $match_prisons_link_class . '" style="font-size:25px;"></span></a>';
+          echo '</td>';
         }
       }
       else{
@@ -236,7 +256,7 @@ if(!class_exists('PPRSUS_Dashboard')){
 
         $add_security_link_class = implode(' ', $link_class);
 
-        echo '<td style="text-align:center;"><a href="' . $add_security_link . '" class="" title="' . esc_html__('Add Security Information', 'pprsus') . '"><span class="' . $add_security_link_class . '"></span></a></td>';
+        echo '<td style="text-align:center;"><a href="' . $add_security_link . '" data-toggle="tooltip" class="" title="' . esc_html__('Add Security Information', 'pprsus') . '"><span class="' . $add_security_link_class . '"></span></a></td>';
       }
       wp_reset_postdata();
     }

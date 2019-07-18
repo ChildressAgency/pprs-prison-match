@@ -52,6 +52,16 @@ if(!class_exists('PPRSUS_Prison_Match')){
     public function admin_init(){
       $pprsus_admin = new PPRSUS_Admin();
 
+      /**
+       * uncomment the next 2 lines below to enable the cron job.
+       * The cron job will first check for and delete any Defendant's Personal Information, Medical History
+       * and Security Information that's older than the number of months set in "Prison Match Form Settings" -> 
+       * "Max Defendant Record Age".  Then it will look for Defendants older than the number of months set in
+       * "Prison Match Form Settings" -> "Defendant Record Send Email", and send out the warning email.
+       */
+      //add_action('wp', array($pprsus_admin, 'create_cron_job'))
+      //add_action('check_expiring_defendants', array($pprsus_admin, 'check_expiring_defendants'));
+
       if(!class_exists('acf')){
         require_once PPRSUS_PLUGIN_DIR . '/vendors/advanced-custom-fields-pro/acf.php';
         add_filter('acf/settings/path', array($pprsus_admin, 'acf_settings_path'));
@@ -107,6 +117,9 @@ if(!class_exists('PPRSUS_Prison_Match')){
 
       add_action('pprsus_before_report', array($template_functions, 'before_review_information'));
       add_action('pprsus_review_information', array($template_functions, 'review_information'));
+
+      add_action('pprsus_before_match_prisons', array($template_functions, 'before_match_prisons'));
+      add_action('pprsus_match_prisons', array($template_functions, 'match_prisons'));
     }//end define_template_hooks
 
     public function load_textdomain(){

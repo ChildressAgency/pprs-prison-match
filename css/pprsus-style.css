@@ -97,6 +97,8 @@
 .info-field{
   float:left;
   margin-bottom:15px;
+  border:1px solid #eee;
+  padding:3px 10px;
 }
 .info-section{
   background-color:#fff;
@@ -133,4 +135,14 @@
 }
 .bop-question div{
   margin-top:15px;
+}
+
+@media print{
+  .hide-on-print{
+    display:block !important;
+    visibility:hidden !important;
+  }
+  .hide-print-if-no{
+    display:none !important;
+  }
 }
