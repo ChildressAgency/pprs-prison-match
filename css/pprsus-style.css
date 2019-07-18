@@ -1,0 +1,148 @@
+.table{
+  width:100%;
+  max-width:100%;
+  border-spacing:0;
+  border-collapse:collapse;
+}
+.table>thead:first-child>tr:first-child>th{
+  border-top:0;
+}
+.table>thead>tr>th{
+  vertical-align:bottom;
+  border-bottom:2px solid #ddd;
+  font-size:18px;
+}
+.table-striped>tbody>tr:nth-of-type(odd){
+  background-color:#f9f9f9;
+}
+.table>tbody>tr>th,
+.table>tbody>tr>td{
+  padding:8px;
+  line-height:1.42;
+  vertical-align:top;
+  border-top:1px solid #ddd;
+  width:50%;
+}
+
+
+.button-primary{
+  background-color:transparent;
+  border:1px solid #333;
+  border-radius:10px;
+  padding:3px 20px;
+  color:#000;
+  -webkit-transition:all .3s ease;
+  transition:all .3s ease;
+}
+.button-primary:hover{
+  background-color:#ddd;
+}
+.btn-worksheet{
+  color:#000;
+}
+.btn-worksheet.validated-worksheet{
+  /*background-color:green;*/
+  color:green;
+}
+.btn-worksheet.draft-worksheet{
+  /*background-color:red;*/
+  color:red;
+}
+.btn-worksheet:hover{
+  color:#ddd;
+}
+
+
+.required{
+  color:#f00;
+  font-weight:bold;
+}
+
+.psr-table .profile-icons{
+  float:right;
+}
+.psr-table .profile-icons>a{
+  margin-left:10px;
+}
+
+.worksheet-nav .nav-tabs{
+  list-style:none;
+  margin-top:25px;
+}
+.worksheet-nav .nav-tabs>li{
+  display:inline-block;
+  margin:5px;
+}
+.worksheet-nav .nav-tabs>li>a{
+  border:1px solid #000;
+  border-radius:8px;
+  -webkit-transition:all .3s ease;
+  transition:all .3s ease;
+  padding:2px 15px;
+  color:#000;
+}
+.worksheet-nav .nav-tabs .not-finished{
+  background-color:#f77;
+}
+.worksheet-nav .nav-tabs .finished{
+  background-color:#009f00;
+}
+.button-primary.worksheet-nav_disabled{
+  border-color:#eee
+}
+
+.blog-section .post.info-review{
+  background-color:transparent;
+}
+.info-field{
+  float:left;
+  margin-bottom:15px;
+  border:1px solid #eee;
+  padding:3px 10px;
+}
+.info-section{
+  background-color:#fff;
+  padding:15px;
+  margin-bottom:30px;
+}
+.info-group::before{
+  display:table;
+  content:" ";
+}
+.info-group::after{
+  display:table;
+  content:" ";
+  clear:both;
+}
+
+#pprsus-worksheet .acf-field-message .acf-label{
+  display:none;
+}
+#pprsus-worksheet .acf-field-message .acf-input{
+  border:none;
+}
+#pprsus-worksheet .acf-input-wrap{
+  height:45px;
+}
+#pprsus-worksheet .acf-field-checkbox .acf-input,
+#pprsus-worksheet .acf-field-radio .acf-input,
+#pprsus-worksheet .acf-field-repeater .acf-input{
+  border:none;
+}
+
+.bop-question{
+  margin-bottom:25px;
+}
+.bop-question div{
+  margin-top:15px;
+}
+
+@media print{
+  .hide-on-print{
+    display:block !important;
+    visibility:hidden !important;
+  }
+  .hide-print-if-no{
+    display:none !important;
+  }
+}
