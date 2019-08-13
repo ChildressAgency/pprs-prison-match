@@ -93,7 +93,7 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
 
       if($this->current_worksheet_is_finished()){ //is $_GET['finished'] set?
         $current_step_group = $this->step_ids;
-        $submit_label = esc_html__('Update', 'pprsus');
+        $submit_label = esc_html__('Finish', 'pprsus');
         $submit_button = '<input type="submit" class="acf-button button button-primary button-large" value="%s" />';
       }
       else{
@@ -273,6 +273,13 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
       //  $query_args['finished'] = 1;
       //}
 
+      if($this->validate_form()){
+        wp_update_post(array(
+          'ID' => $post_id,
+          'post_status' => 'publish'
+        ));
+      }
+
       $redirect_url = add_query_arg($query_args, wp_get_referer());
       wp_safe_redirect($redirect_url);
       exit();
@@ -385,7 +392,9 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
     public function validate_form(){
       if($this->skip_validation()){
         acf_reset_validation_errors();
+        return false;
       }
+      return true;
     }
 
     private function skip_validation(){
@@ -397,8 +406,9 @@ if(!class_exists('PPRSUS_MultiStep_Worksheet')){
         if((isset($_POST['direction'])) && ($_POST['direction'] == 'previous' || $_POST['direction'] == 'saveforlater')){
           return true;
         }
-
-        return false;
+        else{
+          return false;
+        }
       }
 
       return true;

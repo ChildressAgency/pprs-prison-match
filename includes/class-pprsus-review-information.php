@@ -51,10 +51,10 @@ if(!class_exists('PPRSUS_Review_Information')){
         foreach($fields as $field){
           //print_var($field);
           if($this->conditional_met($field, $post_id) && $field['type'] != 'message'){
-            if(have_rows($field['name'], $post_id) && $field['type'] != 'checkbox' && $field['type'] != 'select'){
+            if(have_rows($field['name'], $post_id) && $field['type'] != 'checkbox' && $field['type'] != 'select' && $field['type'] != 'radio'){
+                echo '<h3>' . esc_html($field['label']) . '</h3>';
               while(have_rows($field['name'], $post_id)){
                 the_row();
-                echo '<h3>' . esc_html($field['label']) . '</h3>';
 
                 $field_row = get_row();
                 foreach($field_row as $field_row_key => $field_row_value){
@@ -101,8 +101,17 @@ if(!class_exists('PPRSUS_Review_Information')){
 
       if($field['type'] == 'checkbox' || $field['type'] == 'select'){
         if(is_array($field_value)){
-          $field_value = implode(', ', $field_value);
+          $field_value = implode(', ', $field['value']);
         }
+      }
+
+      if($field['type'] == 'radio'){
+        $field_value = $field['value'];
+      }
+
+      if($field['type'] == 'post_object'){
+        //print_var($field);
+        $field_value = $field['value']->post_title;
       }
 
       $field_classes = array();
@@ -176,7 +185,8 @@ if(!class_exists('PPRSUS_Review_Information')){
         'author' => $this->user_id,
         'posts_per_page' => 1,
         'meta_key' => 'defendant_id',
-        'meta_value' => $this->defendant_info['defendant_id']
+        'meta_value' => $this->defendant_info['defendant_id'],
+        'post_status' => array('publish', 'draft')
       );
 
       $form_query = new WP_Query($form_query_args);

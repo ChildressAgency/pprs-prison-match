@@ -142,7 +142,7 @@ if(!class_exists('PPRSUS_Match_Prisons')){
         }
       }
 
-      return $care_level;
+      return $care_level == 0 ? 2 : $care_level;
     }
 
     private function get_medical_form_ids(){
