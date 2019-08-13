@@ -145,4 +145,10 @@
   .hide-print-if-no{
     display:none !important;
   }
+
+  .site-footer,
+  .navbar,
+  .custom-header{
+    display:none;
+  }
 }

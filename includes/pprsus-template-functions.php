@@ -63,7 +63,21 @@ if(!class_exists('PPRSUS_Template_Functions')){
     }
 
     public function before_review_information(){
-      echo '<h2>' . esc_html__('Review PSR Information', 'pprsus') . '</h2>';
+      //echo '<h2>' . esc_html__('Review PSR Information', 'pprsus') . '</h2>';
+      $before_review_information = get_option('options_before_review_information');
+
+      if($before_review_information){
+        //echo wp_kses_post($before_review_information);
+        echo apply_filters('the_content', wp_kses_post($before_review_information));
+      }
+    }
+
+    public function after_review_information(){
+      $after_review_information = get_option('options_after_review_information');
+
+      if($after_review_information){
+        echo apply_filters('the_content', wp_kses_post($after_review_information));
+      }
     }
 
     public function before_match_prisons(){

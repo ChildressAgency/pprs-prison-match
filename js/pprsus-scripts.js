@@ -30,12 +30,19 @@ jQuery(document).ready(function($){
     });
   }
 
+  $('.acf-form .disabled *').prop('disabled', 'disabled');
+
   $('[data-toggle="tooltip"]').tooltip();
 
   $('.pprsus-submit').on('click', function(){
     var direction = $(this).attr('name');
     $('#direction').val(direction);
     $('#pprsus-worksheet').submit();
+  });
+
+  $('#btn-print').on('click', function(){
+    window.print();
+    return false;
   });
 
   //change user

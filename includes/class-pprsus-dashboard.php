@@ -219,24 +219,30 @@ if(!class_exists('PPRSUS_Dashboard')){
 
           $edit_security_link_class = implode(' ', $edit_link_class);
 
-          $match_prisons_link_args = array(
-            'post_id' => $security_form_id,
-            'defendant_id' => $defendant_id,
-            'token' => get_post_meta($security_form_id, 'secret_token', true),
-          );
-          $match_prisons_link = add_query_arg($match_prisons_link_args, home_url('match-prisons'));
+          //only show match prisons link if defendant, medical history and security are published
+          $match_prisons_icon = '';
+          if($this->forms_published($defendant_id)){
+            $match_prisons_link_args = array(
+              'post_id' => $security_form_id,
+              'defendant_id' => $defendant_id,
+              'token' => get_post_meta($security_form_id, 'secret_token', true),
+            );
+            $match_prisons_link = add_query_arg($match_prisons_link_args, home_url('match-prisons'));
 
-          $match_link_class = array();
-          $match_link_class[] = 'dashicons';
-          $match_link_class[] = 'dashicons-search';
-          $match_link_class[] = 'btn-worksheet';
-          $match_link_class[] = (get_post_status() == 'publish') ? 'validated-worksheet' : 'draft-worksheet';
+            $match_link_class = array();
+            $match_link_class[] = 'dashicons';
+            $match_link_class[] = 'dashicons-search';
+            $match_link_class[] = 'btn-worksheet';
+            $match_link_class[] = (get_post_status() == 'publish') ? 'validated-worksheet' : 'draft-worksheet';
 
-          $match_prisons_link_class = implode(' ', $match_link_class);
+            $match_prisons_link_class = implode(' ', $match_link_class);
+
+            $match_prisons_icon = '<a href="' . $match_prisons_link . '" data-toggle="tooltip" class="" title="' . esc_html__('Match Prisons', 'pprsus')  . '" style="margin-left:15px;"><span class="' . $match_prisons_link_class . '" style="font-size:25px;"></span></a>';
+          }
 
           echo '<td style="text-align:center;">';
           echo '<a href="' . $edit_security_link . '" data-toggle="tooltip" class="" title="' . esc_html__('Edit Security Information', 'pprsus') . '"><span class="' . $edit_security_link_class . '"></span></a>';
-          echo '<a href="' . $match_prisons_link . '" data-toggle="tooltip" class="" title="' . esc_html__('Match Prisons', 'pprsus')  . '" style="margin-left:15px;"><span class="' . $match_prisons_link_class . '" style="font-size:25px;"></span></a>';
+          echo $match_prisons_icon;
           echo '</td>';
         }
       }
@@ -259,6 +265,54 @@ if(!class_exists('PPRSUS_Dashboard')){
         echo '<td style="text-align:center;"><a href="' . $add_security_link . '" data-toggle="tooltip" class="" title="' . esc_html__('Add Security Information', 'pprsus') . '"><span class="' . $add_security_link_class . '"></span></a></td>';
       }
       wp_reset_postdata();
+    }
+
+    private function forms_published($defendant_id){
+      //print_var($defendant_id);
+      if(get_post_status($defendant_id) !== 'publish'){
+        return false;
+      }
+
+      $medical_history = new WP_Query(array(
+        'post_type' => 'medical_history',
+        'posts_per_page' => 1,
+        'meta_key' => 'defendant_id',
+        'meta_value' => $defendant_id
+      ));
+      if($medical_history->have_posts()){
+        while($medical_history->have_posts()){
+          $medical_history->the_post();
+
+          if(get_post_status(get_the_ID()) !== 'publish'){
+            return false;
+          }
+        }
+      }
+      else{
+        print_var($defendant_id);
+        return false;
+      } wp_reset_postdata();
+
+      $security = new WP_Query(array(
+        'post_type' => 'security',
+        'posts_per_page' => 1,
+        'meta_key' => 'defendant_id',
+        'meta_value' => $defendant_id
+      ));
+      if($security->have_posts()){
+        while($security->have_posts()){
+          $security->the_post();
+
+          if(get_post_status(get_the_ID()) !== 'publish'){
+            return false;
+          }
+        }
+      }
+      else{
+        return false;
+      } wp_reset_postdata();
+
+      return true;
     }
 
     private function get_defendants(){
