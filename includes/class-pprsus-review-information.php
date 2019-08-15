@@ -43,8 +43,9 @@ if(!class_exists('PPRSUS_Review_Information')){
 
       foreach($info_groups as $group){
         $section_name = $this->get_section_name($group);
+        $hidden_print = ($group == 'group_5d55924febe28') ? ' class="hidden-print"' : '';
         echo '<div class="info-section">
-                <h3>' . esc_html__($section_name) . '</h3>
+                <h3' . $hidden_print . '>' . esc_html__($section_name) . '</h3>
                 <div class="info-group">';
 
         $fields = acf_get_fields($group);
