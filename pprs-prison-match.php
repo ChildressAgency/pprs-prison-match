@@ -97,6 +97,15 @@ if(!class_exists('PPRSUS_Prison_Match')){
 
       new PPRSUS_Import_BOP_Drugs();
       new PPRSUS_Import_Prison_Data();
+
+      add_filter('acf/fields/post_object/result/key=field_5d28e0996781d', array($this, 'add_term_to_medication'), 10, 4);
+    }
+
+    public function add_term_to_medication($title, $post, $field, $post_id){
+      $post_terms = wp_get_post_terms($post->ID, 'drug_types', array('fields' => 'names'));
+      $title .= ' (' . $post_terms[0] . ')';
+
+      return $title;
     }
 
     /**
