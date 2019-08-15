@@ -127,7 +127,12 @@ if(!class_exists('PPRSUS_Review_Information')){
         echo '<span class="required hide-on-print">No entry - Required Field</span>';
       }
       else{
-        echo $field_value ? $field_value : '<span class="hide-on-print" style="font-style:italic;">missing</span>';
+        if($field['wrapper']['class'] == 'disabled'){
+          echo $field_value ? $field_value : '<span class="hide-on-print" style="font-style:italic;">To be entered after printing</span>';
+        }
+        else{
+          echo $field_value ? $field_value : '<span class="hide-on-print" style="font-style:italic;">missing</span>';
+        }
       }
       echo '</div>';
     }
