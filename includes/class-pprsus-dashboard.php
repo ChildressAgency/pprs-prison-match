@@ -74,7 +74,8 @@ if(!class_exists('PPRSUS_Dashboard')){
     }
 
     private function output_defendant_field($defendant_id){
-      $defendant_name = get_the_title($defendant_id);
+      //$defendant_name = get_the_title($defendant_id);
+      $defendant_name = get_field('client_id', $defendant_id);
       //edit defendant link settings
       $edit_link_args = array(
         'post_id' => $defendant_id,
