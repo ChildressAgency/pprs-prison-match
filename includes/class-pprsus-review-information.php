@@ -52,7 +52,7 @@ if(!class_exists('PPRSUS_Review_Information')){
         foreach($fields as $field){
           //print_var($field);
           if($this->conditional_met($field, $post_id) && $field['type'] != 'message'){
-            if(have_rows($field['name'], $post_id) && $field['type'] != 'checkbox' && $field['type'] != 'select' && $field['type'] != 'radio'){
+            if(have_rows($field['name'], $post_id) && $field['type'] != 'checkbox' && $field['type'] != 'select'){
                 echo '<h3>' . esc_html($field['label']) . '</h3>';
               while(have_rows($field['name'], $post_id)){
                 the_row();
@@ -101,18 +101,29 @@ if(!class_exists('PPRSUS_Review_Information')){
       }
 
       if($field['type'] == 'checkbox' || $field['type'] == 'select'){
+        //print_var($field);
         if(is_array($field_value)){
-          $field_value = implode(', ', $field['value']);
+          //$field_value = implode(', ', $field['value']);
+          $field_value = implode(', ', $field_value);
         }
       }
 
-      if($field['type'] == 'radio'){
-        $field_value = $field['value'];
+      //if($field['type'] == 'radio'){
+        //print_var($field);
+        //$field_value = $field['value'];
+      //}
+
+      if($field['type'] == 'radio' && is_array($field_value)){
+        //$field_value = $field['value'];
+        //$field_value = $field_value['value'];
+        $field_value = $field['choices'][$field_value['value']];
       }
 
       if($field['type'] == 'post_object'){
         //print_var($field);
-        $field_value = $field['value']->post_title;
+        if($field['value']){
+          $field_value = $field['value']->post_title;
+        }
       }
 
       $field_classes = array();
