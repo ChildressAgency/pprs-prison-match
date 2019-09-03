@@ -128,7 +128,7 @@ if(!class_exists('PPRSUS_Review_Information')){
 
       $field_classes = array();
       $field_classes[] = 'info-field';
-      if(($field['wrapper']['class'] == 'hide-print-if-no') && ($field_value == 'No' || $field_value == '')){
+      if(($field['wrapper']['class'] == 'hide-print-if-no') && ($field_value == 'No' || $field_value == '' || $field_value == 'missing')){
         $field_classes[] = 'hide-print-if-no';
       }
       $field_class = implode(' ', $field_classes);
