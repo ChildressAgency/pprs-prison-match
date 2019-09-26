@@ -131,8 +131,8 @@ if(!class_exists('PPRSUS_Match_Prisons')){
 
           foreach($medical_form_ids as $form_id){
             $medical_question = get_field($question['value'], $form_id);
-
-            if(($medical_question) && ($medical_question == 'yes' || $medical_question == true)){
+//var_dump($medical_question);
+            if(($medical_question) && ($medical_question == 'Yes' || $medical_question == 'yes')){
 
               if((int)$care_level < (int)$question_care_level['value']){
                 $care_level = $question_care_level['value'];
